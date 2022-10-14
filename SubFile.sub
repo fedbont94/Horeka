@@ -1,0 +1,13 @@
+#!/bin/bash
+#SBATCH --job-name=PhotonCorsikaSimulation
+#SBATCH --output=/home/hk-project-pevradio/rn8463/logCorsikaGamma/_log%a.out
+#SBATCH --error=/home/hk-project-pevradio/rn8463/logCorsikaGamma/_log%a.err
+#SBATCH --nodes=1
+#SBATCH --time=2-00:00:00
+#SBATCH --tasks=2
+#SBATCH --mem=100gb
+#SBATCH --export=NONE
+
+source /home/hk-project-pevradio/rn8463/.bashrc
+cd /home/hk-project-pevradio/rn8463/corsika/corsika-77401/run/
+/hkfs/home/project/hk-project-pevradio/rn8463/virtual_env/bin/python3 /home/hk-project-pevradio/rn8463/corsika_simulations/MakeCorsikaSim.py
