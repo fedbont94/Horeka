@@ -1,0 +1,103 @@
+#!/usr/bin/env python3
+"""
+This class can be used for generating the submission stings and sh executable files. 
+It also has the generator function which yields the keys and string to submit, 
+made via the combinations of file and energies 
+
+@author: Federico Bontempo <federico.bontempo@kit.edu> PhD student KIT Germany
+@date: October 2022
+"""
+import numpy as np
+import os
+import stat
+
+class SimulationMaker:
+    """
+    This class has to useful functions. 
+        generator: which yields a key and a string to submit 
+        makeStringToSubmit: which writes a temporary file and a string to submit
+    
+    Parameters:
+        startNumber:    the start of the simulation (eg. integer default value 0)
+        endNumber:      the end of the simulation (eg. integer default value if startNumber is 0, 
+                        it is the total number of simulations.
+        energies:       the array binned in energies for the simulation
+        fW:             the file writer class. In order to use some of the functions in this class
+        pathCorsika:    the path where Corsika is installed
+        corsikaExe:     the name of the Corsika executable that needs to be used
+    
+    """
+    def __init__(self, startNumber, endNumber, energies, fW, pathCorsika, corsikaExe):
+        self.startNumber = startNumber
+        self.endNumber = endNumber
+        self.energies = energies
+        self.fW = fW
+        self.pathCorsika = pathCorsika
+        self.corsikaExe = corsikaExe
+
+    def generator(self):
+        """
+        This function generates all possible configuration of energy and file number. 
+        It yields the key and the String to submit
+        The yield function returns every time a different value as the for loop proceeds
+        """
+        # This is a loop over all energies and gives the low and high limit values.
+        # Eg. 5.0 and 5.1
+        for log10_E1, log10_E2 in zip(self.energies[:-1], self.energies[1:]):
+            # Creates "data", "temp", "log", "inp" folders and energy subfolder
+            self.fW.makeFolders(log10_E1)
+
+            # This is a way to generate a unique number for each simulation that 
+            # can be used as a seed for Corsika
+            binNumber = (log10_E1 - 5) * 10
+            binArray = np.arange(
+                ((self.startNumber + binNumber) * self.endNumber),
+                ((self.startNumber + binNumber + 1) * self.endNumber + 1),
+                1,
+                np.int,
+            )
+            # It loops over all the unique numbers 
+            for procNumber, runNumber in zip(binArray[:-1], binArray[1:]):
+                # Creates the file name for the simulation
+                fileNumber = f"4{runNumber:05d}"
+                # Check if this simulation is not in data. Thus, was already created
+                # There is thus no need to redo it
+                if f"DAT{fileNumber}" not in os.listdir(
+                    f"{self.fW.directories['data']}/{log10_E1}/"
+                ):
+                    # It writes the Corsika input file 
+                    self.fW.writeFile(procNumber, runNumber, log10_E1, log10_E2)
+                    # The unique key for the the Submitter is created as followed. 
+                    # It has not practical use, nut MUST be unique 
+                    key = f"{log10_E1}_{fileNumber}"
+                    # It calls the function to create a sting which will be used for the job execution
+                    stringToSubmit = self.makeStringToSubmit(log10_E1, fileNumber)
+                    yield (key, stringToSubmit)
+
+    def makeStringToSubmit(self, log10_E, fileNumber):
+        # A few paths to files are defined. 
+        inpFile = f"{self.fW.directories['inp']}/{log10_E}/SIM{fileNumber}.inp" # input file
+        logFile = f"{self.fW.directories['log']}/{log10_E}/DAT{fileNumber}.log" # log file 
+        # The move command which moves the file from the temporary directory to the data directory 
+        # when the simulation is completed
+        mvCommand = f"mv {self.fW.directories['temp']}/{log10_E}/{fileNumber}DAT{fileNumber} {self.fW.directories['data']}/{log10_E}/DAT{fileNumber}"
+
+        # Makes a temp file for the execution of corsika.
+        tempFile = f"{self.fW.directories['temp']}/{log10_E}/temp_{fileNumber}.sh"
+        with open(tempFile, "w") as f:
+            f.write(r"#!/bin/sh") # This shows that the file is an executable
+            f.write(
+                f"\ncd {self.pathCorsika}" # You must execute corsica in its folder. Otherwise returns an error
+                + f"\n{self.pathCorsika}/{self.corsikaExe} < {inpFile} > {logFile}" # This is how you execute a corsika file 
+                + f"\n{mvCommand}" # Move the file form temp directory to the data directory
+                + f"\nrm {tempFile}" # It removes this temporary file since it is not needed anymore 
+            )
+
+        # Make the file executable
+        st = os.stat(tempFile)
+        os.chmod(tempFile, st.st_mode | stat.S_IEXEC)
+
+        # The stringToSubmit is basically the execution of the temporary sh file
+        subString = tempFile
+        return subString
+

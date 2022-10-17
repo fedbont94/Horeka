@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
 
 """
-This is the master script which spawns subprocesses for multiple instances instead of multiple job submissions.
+This class can be used to spawns subprocesses for multiple instances instead of multiple job submissions.
 This takes a single CPU and actually performs a busy wait in Popen.communicate function.
+
+@author: Federico Bontempo <federico.bontempo@kit.edu> PhD student KIT Germany
+@date: October 2022
 """
-# import os
-# import numpy as np
+
 import subprocess
 import time
 
@@ -108,7 +110,6 @@ class Submitter:
         with open(f"{self.logDir}/output_{key}.err", "w") as f:
             f.write(str(err))
 
-        print("Deleting key")
         self.deleteSingleProcess(key)
         
         print("\n==================== New Process ====================")
@@ -128,36 +129,3 @@ class Submitter:
         """
         if key in self.processDict.keys():
             self.processDict.pop(key).kill()
-
-
-# def mainLoop():
-#     """
-#     This is the main part of the code.
-#     It calls the class Submitter where you need to define:
-
-#     prim: name of the primary
-#     energies: array or list of energies 
-#     numbOfFiles: number of files in the folder per energy per zenith
-#     parallelRunningSims: number of parallel detector response simulations that wants to be processed
-#     processDict: Directory where all the running detector responses are stored
-#     generated_paths: is an that references to the function that yields the variables needed for the simulation
-#     """
-    
-#     submitter = Submitter(
-#                 MakeKeySubString=TODO_function(), 
-#                 num_files=201, 
-#                 logDir="", 
-#                 parallel_sim=50)
-
-#     # It starts the submitting by submitting as many processes as chosen
-#     submitter.startProcesses()
-    
-#     # It starts the checks on the running processes
-#     submitter.checkRunningProcesses()
-
-
-# if (__name__ == '__main__'):
-    
-#     mainLoop()
-    
-#     print("-------------------- Program finished --------------------")
