@@ -49,7 +49,7 @@ class SimulationMaker:
 
             # This is a way to generate a unique number for each simulation that 
             # can be used as a seed for Corsika
-            binNumber = (log10_E1 - 5) * 10
+            binNumber = np.round((log10_E1 - 5) * 10, decimals=1)
             binArray = np.arange(
                 ((self.startNumber + binNumber) * self.endNumber),
                 ((self.startNumber + binNumber + 1) * self.endNumber + 1),
