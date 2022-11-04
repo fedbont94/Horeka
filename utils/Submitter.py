@@ -38,7 +38,7 @@ class Submitter:
         for _ in range(self.parallelRunningSims):
             self.startSingleProcess()        
             
-    def startSingleProcess(self):
+    def startSingleProcess(self, key=None, processString=None):
         """
         It starts a single process.
         It gets the key and the processString returned by the yield
@@ -51,22 +51,25 @@ class Submitter:
         adds it to the processDict.
         In case the key is not valid, it prints a message to the user.
         """       
-        key, processString = next(self.key_processString_generator, (None, None))
-        if key is not None:
+        if ((key is None) or (processString is None)):
+            key, processString = next(self.key_processString_generator, (None, None))
+            
+        if ((key is not None) and (processString is not None)):            
+            print("\n==================== New Process ====================")
             self.processDict[key] = subprocess.Popen(
                 processString.split(),
                 stderr=subprocess.PIPE,
                 stdout=subprocess.PIPE,
             ) 
-        else:
-            print("No more files in yield")        
+        # else:
+        #     print("No more files in yield")        
         return
     
     def checkRunningProcesses(self):
         """
         It is a continuos check over the running simulations.
         As long as there are keys in the processDict it keeps the checking.
-        If one process is completed, it calls communicateSingleProcess.
+        This is done by calling the singleCheck function 
         It then waits a few seconds before performing the checks again.
         This is done to avoid overloading the CPU with useless checks 
         """     
@@ -75,20 +78,31 @@ class Submitter:
 
         # If there are processes active it keeps looping in while
         while keyToLoop:
-            for key in keyToLoop:
-                # Check if the process is completed
-                if self.processDict[key].poll() is not None:
-                    
-                    # Communicates the process that is completed
-                    keyToLoop = self.communicateSingleProcess(key)
-            
+            keyToLoop = self.singleCheck()            
             # Waits before restarting the loop.
             # This is done to avoid overloading the CPU with useless checks 
             sleepTime = 10
             time.sleep(sleepTime)
         return
 
-            
+
+    def singleCheck(self):
+        """
+        Performs a single loop over all running processes and check if one is completed.
+        If one process is completed, it calls communicateSingleProcess.
+        ----------------------------------------------------------------------
+        Returns:
+            keyToLoop: The updated keys over which the loop has to be performed
+        """
+        keyToLoop = list(self.processDict.keys())
+        for key in keyToLoop:
+            # Check if the process is completed
+            if self.processDict[key].poll() is not None:
+                # Communicates the process that is completed
+                keyToLoop = self.communicateSingleProcess(key)
+        return keyToLoop
+      
+     
     def communicateSingleProcess(self, key):
         """
         After the check if the process is completed, it communicates the output.
@@ -112,7 +126,6 @@ class Submitter:
 
         self.deleteSingleProcess(key)
         
-        print("\n==================== New Process ====================")
         self.startSingleProcess()
 
         keyToLoop = list(self.processDict.keys())
