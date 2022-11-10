@@ -45,7 +45,7 @@ class MultiProcesses:
         In case the key is not valid, it prints a message to the user.
         """       
         if ((key is None) or (keyArgs is None)):
-            key, keyArgs = next(self.keysGenerator, (None, None))
+            key, *keyArgs = next(self.keysGenerator, (None, None))
             
         if ((key is not None) and (keyArgs is not None)):            
             print("\n==================== New Process ====================")

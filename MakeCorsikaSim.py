@@ -32,10 +32,11 @@ from utils.Submitter import Submitter
 
 def mainCorsikaSim(args):
     
-    energies = np.around(
-        np.arange(args.energyStart, args.energyEnd + args.energyStep, args.energyStep), 
-        decimals=1
-    )
+    energies = np.linspace(
+        args.energyStart, # Start point 
+        args.energyEnd, # End point (excluded)
+        num=int((args.energyEnd-args.energyStart+args.energyStep)/args.energyStep), # Number of points (end-start+step)/step
+        ) 
 
     fW = FileWriter(
         username=args.username,                 # User name on server

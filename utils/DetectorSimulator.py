@@ -53,16 +53,15 @@ class DetectorSimulator():
         pathlib.Path(f"{self.outDirectory}/gcd/").mkdir(parents=True, exist_ok=True)
         if not os.path.isfile(self.Lv3GCD):            
             print("Making the GCD file")
-            os.system(f"{self.pythonPath} {self.i3build}/icetop_Level3_scripts/resources/scripts/MakeL3GCD_MC.py --MCgcd {self.GCD} --output {self.Lv3GCD}")
-        
-    
+            os.system(f"{self.pythonPath} {self.i3build}/icetop_Level3_scripts/resources/scripts/MakeL3GCD_MC.py --MCgcd {self.GCD} --obslevel 2840. --output {self.Lv3GCD}")
+            
     def writeSHexeFile(self, exeFile, cmdPython, cmdOptions, cmdMoveFile, cmdSTART= "", cmdEND=""):
         """
         Writes the executable file and makes it executable.
         The exeFile will: 
             runs the python script
             move the file from the temp to the data directory
-            removes the exeFile once completed (if the command is given)
+            can remove the exeFile once completed (if the command is given)
         ----------------------------------------------------------------
         Parameters:
             exeFile: the name of the executable
@@ -131,7 +130,13 @@ class DetectorSimulator():
         Runs the icetopshowergenerator.py scripts with the default options
         --------------------------------------------------------
         Parameters:
-        
+            energy: the energy in log10 E/GeV
+            runname: the name of the
+            inputFile: the name of the input file in this case it is the Corsika output file
+            nproc: the number of
+            procnum: 
+            runID: 
+            extraOptions: the extra Options that can be passed to the python script
         Return:
             exeFile: the file that need to be executed
         """
@@ -147,8 +152,20 @@ class DetectorSimulator():
         if os.path.isfile(ITSGdataFile):
             return None, ITSGdataFile
         
+        # this function makes the data, temp, logs, inps directory
         self.make_folders(outputFolder, energy)   
         
+        # TODO never checked if the untar of the bz2 file works
+        if inputFile.endswith(".bz2"):
+            baseName = os.path.basename(inputFile)
+            name, _, __ = baseName.partition('.bz2') 
+            pathTemp = f"{outputFolder}/temp/{energy}/"
+            cmdSTART = f"\nbzip2 -dc {inputFile} > {pathTemp}{name} \n"
+            inputFile = f"{pathTemp}/{name}"   
+        else: 
+            cmdSTART="\n"     
+        
+        # The python script that needs to be executed with its arguments    
         cmdPython = f"{self.pythonPath} {self.i3build}/simprod-scripts/resources/scripts/icetopshowergenerator.py "
         cmdOptions = f"\
             --UseGSLRNG \
@@ -165,17 +182,13 @@ class DetectorSimulator():
             "
         if extraOptions:
             cmdOptions+=extraOptions
-            
+        
+        # moves the file to its final location once everything is done
         cmdMoveFile = f"mv {tempFile} {ITSGdataFile}"
-        
-        # TODO add the untar of the bz2 file 
-        if inputFile.endswith(".bz2"):
-            pass
-            # cmdSTART = f"\nbzip2 -d {inputFile}"
 
-        self.writeSHexeFile(exeFile, cmdPython, cmdOptions, cmdMoveFile)
+        # writes the sh file and makes it executable
+        self.writeSHexeFile(exeFile, cmdPython, cmdOptions, cmdMoveFile, cmdSTART=cmdSTART)
         
-        # Execute ITS via submitter 
         return exeFile, ITSGdataFile
     
     def run_clsim(self, energy, runname, inputFile, nproc, procnum, extraOptions="",
@@ -225,12 +238,7 @@ class DetectorSimulator():
         
         self.writeSHexeFile(exeFile, cmdPython, cmdOptions, cmdMoveFile)
         
-        # Execute ITS via submitter 
         return exeFile, inputFile
-        
-        cmdlineCLS=f"{self.pythonPath} {self.i3build}/simprod-scripts/resources/scripts/clsim.py --UseGSLRNG --gcdfile {self.GCD} --seed {self.seed} --procNumb {self.procNumb} --UseGPUs --oversize {oversize} --IceModel {icemodel} --IceModelLocation {icemodellocation} --holeiceparametrization {holeiceparametrization} --efficiency {efficiency} \
-        --procnum {procnum} --inputfilelist {inputFile}.i3.bz2 --outputfile {CLSname}.i3.bz2 > {CLSdest}.out 2> {CLSdest}.err"
-        return
     
     def run_detector(self, energy, runname, inputFile, nproc, procnum, runID, doFiltering,
             extraOptions="",

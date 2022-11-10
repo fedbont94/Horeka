@@ -2,11 +2,6 @@
 
 import os
 import numpy as np
-import pathlib
-import stat
-import time 
-
-import multiprocessing as mp
 
 from utils.Submitter import Submitter
 from utils.MultiProcesses import MultiProcesses
@@ -22,15 +17,16 @@ def make_parser():
     parser = argparse.ArgumentParser(
         description="Inputs for the Detector Response Maker"
     )
-    
+    ############################## Directories paths ####################################
     parser.add_argument(
-        "--dataset",
-        type=float,
-        default=13400.0,
-        help="dataset number: eg. 13000.0 H, 13100.0 He, 13200.0 Oxygen, 13300.0 Fe, 13400.0 Gamma",
+        "-inDirectory",
+        type=str,
+        default="/lsdf/kit/ikp/projects/IceCube/sim/gamma-sim/data/",
+        help="Directory where the simulation are stored. Please give the data folder. \
+            This script assumes that in this folder there are subdirectories with energy number",
     )
     parser.add_argument(
-        "--outDirectory",
+        "-outDirectory",
         type=str,
         default="/lsdf/kit/ikp/projects/IceCube/sim/gamma-sim/",
         help="Directory where the detector response  has to be stored. \
@@ -39,51 +35,31 @@ def make_parser():
             for level 0s, <output>/filtered/Level[1|2]_DETECTOR_corsika_icetop.MCDATASET.RUN.i3.bz2, for level 1 and 2, Level3_DETECTOR_DATASET_Run.RUN.i3.bz2 for level3 \
             The condor files will be saved in the realtive condor folders",
     )
+    ############################# General Requirement #####################################        
     parser.add_argument(
-        "--inDirectory",
-        type=str,
-        default="/lsdf/kit/ikp/projects/IceCube/sim/gamma-sim/data/",
-        help="Directory where the simulation are stored. Please give the data folder. \
-            This script assumes that in this folder there are subdirectories with energy number",
-    )
-    parser.add_argument(
-        "-ITSOPTIONS", 
+        "-pythonPath", 
         type=str, 
-        default="", 
-        help="  Enquoted other options for icetopsimulator.py; example: -o --raise-observation-level 3"
-    )
-    
+        default="/usr/bin/python3", 
+        help="Python path which runs the simulations of detector response"
+    )      
     parser.add_argument(
-        "-DETOPTIONS",
-        type=str,
-        default="",
-        help="  Enquoted other options for detector.py (level 0 simulation)",
-    )
-    parser.add_argument(
-        "-LV1OPTIONS",
-        type=str,
-        default="",
-        help="  Enquoted other options for SimulationFiltering.py (level 1 simulation)",
-    )
-    parser.add_argument(
-        "-LV2OPTIONS",
-        type=str,
-        default="",
-        help="  Enquoted other options for process.py (level 2 simulation)",
-    )
-
-    parser.add_argument(
-        "-LV3OPTIONS", 
+        "-i3build", 
         type=str, 
-        default="", 
-        help="  Enquoted other options for level3_iceprod.py (level 3 simulation); available only if -a is declared"
+        default="/home/hk-project-pevradio/rn8463/icetray/build/", 
+        help="The path to the build directory of icetray environment"
     )
     parser.add_argument(
-        "-DETECTOR", 
+        "-detector", 
         type=str, 
         default="IC86", 
-        help="     Detector type/geometry (IC79, IC86, IC86.2012...): the full name will be used only for L3 reconstruction,\
+        help="Detector type/geometry (IC79, IC86, IC86.2012...): the full name will be used only for L3 reconstruction,\
             while for the other only the base (i.e. IC86 if declared IC86.2012) [default: IC86]"
+    )
+    parser.add_argument(
+        "-GCD", 
+        type=str, 
+        default="/lsdf/kit/ikp/projects/IceCube/sim/GCD/GeoCalibDetectorStatus_2012.56063_V1_OctSnow.i3.gz", 
+        help="path where the GCD lv2 file is located"
     )
     parser.add_argument(
         "-year", 
@@ -92,34 +68,22 @@ def make_parser():
         help="Detector year it will be used for the full detector name in the L3 reconstruction."
     )
     parser.add_argument(
-        "-GCD", 
-        type=str, 
-        default="/data/sim/sim-new/downloads/GCD/GeoCalibDetectorStatus_2012.56063_V1_OctSnow.i3.gz", 
-        help=" file [default: /data/sim/sim-new/downloads/GCD/GeoCalibDetectorStatus_2012.56063_V1_OctSnow.i3.gz]"
-    )
-    parser.add_argument(
-        "-NSAMPLES", 
-        type=int, 
-        default=100, 
-        help="    How many samples per run will be simulated by icetopshowergenerator.py [default: 100]"
-    )
-    parser.add_argument(
-        "-NFAMRES", 
-        type=int, 
-        default=0, 
-        help="     How many frames will be processed (0=unbound) [default: 0] "
-    )
-    parser.add_argument(
-        "-MCDATASET", 
+        "-MCdataset", 
         type=int, 
         default=13400, 
-        help="    Number of corsika dataset [default: 13410]"
+        help="Number of corsika dataset [default: 13410]"
     )
     parser.add_argument(
-        "-DATASET", 
+        "-dataset", 
         type=int, 
-        default=13400, 
-        help="      Number of dataset [default: 12360]"
+        default=12012, 
+        help="Number of dataset [default: 12012]"
+    )
+    parser.add_argument(
+        "-seed", 
+        type=int, 
+        default=120120000, 
+        help="The seed is the base seed which is 100_000 times the given dataset number"
     )
     parser.add_argument(
         "-doLv3", 
@@ -131,37 +95,93 @@ def make_parser():
         action='store_true', # default False
         help="Cut data with the trigger filtering. Useful for Level 0, 1 and 2"
     )
-    
+    ############################## Energy ####################################
     parser.add_argument(
-        "--energyStart", 
+        "-energyStart", 
         type=float, 
         default=5.0, 
         help="Lower limit of energy"
     )
     parser.add_argument(
-        "--energyEnd", 
+        "-energyEnd", 
         type=float, 
         default=7.0, 
         help="Upper limit of energy"
     )
     parser.add_argument(
-        "--energyStep", 
+        "-energyStep", 
         type=float, 
         default=0.1, 
         help="Step in energy, 0.1 default (do not change unless you know what you are doing)"
     )
-
+    ############################# Parallelization #####################################
     parser.add_argument(
-        "--logDirProcesses",
+        "-logDirProcesses",
         type=str,
-        default="/home/hk-project-pevradio/rn8463/logCorsikaGamma/",
+        default="/home/hk-project-pevradio/rn8463/logDetResponse/",
         help="Directory where log files of the multiple subProcesses are stored",
     )
     parser.add_argument(
-        "--parallelSim",
+        "-parallelSim",
         type=int,
         default=100,
         help="Number of parallel simulation processes",
+    )
+    ##################################################################
+    parser.add_argument(
+        "--photonDirectory", 
+        type=str, 
+        default="/lsdf/kit/ikp/projects/IceCube/sim/photon-tables/", 
+        help="The path where the photon library is located. Needed for the simulations"
+    )    
+    parser.add_argument(
+        "--NumbSamples", 
+        type=int, 
+        default=100, 
+        help="How many samples per run will be simulated by icetopshowergenerator.py [default: 100]"
+    )
+    parser.add_argument(
+        "--NumbFrames", 
+        type=int, 
+        default=0, 
+        help="How many frames will be processed (0=unbound) [default: 0] "
+    )
+    ############################# Scripts Extra Options #####################################
+    parser.add_argument(
+        "--ITSG_ExtraOptions", 
+        type=str, 
+        default="", 
+        help="  Enquoted other options for icetopsimulator.py; example: -o --raise-observation-level 3"
+    )    
+    parser.add_argument(
+        "--clsim_ExtraOptions", 
+        type=str, 
+        default="", 
+        help="  Enquoted other options for clsim.py; example: -o --raise-observation-level 3"
+    )
+    parser.add_argument(
+        "--DET_ExtraOptions",
+        type=str,
+        default="",
+        help="  Enquoted other options for detector.py (level 0 simulation)",
+    )
+    parser.add_argument(
+        "--LV1_ExtraOptions",
+        type=str,
+        default="",
+        help="  Enquoted other options for SimulationFiltering.py (level 1 simulation)",
+    )
+    parser.add_argument(
+        "--LV2_ExtraOptions",
+        type=str,
+        default="",
+        help="  Enquoted other options for process.py (level 2 simulation)",
+    )
+    parser.add_argument(
+        "--LV3_ExtraOptions", 
+        type=str, 
+        default="", 
+        help="Enquoted other options for level3_iceprod.py (level 3 simulation); available only if -a is declared"
     )
     return parser
     
@@ -169,17 +189,17 @@ def generatorFake():
     yield None, None
 
 class ProcessRunner():
-    def __init__(self, detectorSim, submitter, energies, inDirectory, doFiltering):
+    def __init__(self, detectorSim, submitter, energies, inDirectory, doFiltering, extraOptions={}):
         self.detectorSim = detectorSim
         self.submitter = submitter 
         self.energies = energies
         self.inDirectory = inDirectory
-        self.doFiltering = doFiltering       
+        self.doFiltering = doFiltering
+        self.extraOptions = extraOptions       
 
-    def generatorKeys(self, DATASET):
+    def generatorKeys(self):
         """
         nproc is the number of input files you give (e.g. I have 667 in each energy bin folder)
-        seed is the base seed which is 10000 times the given dataset number
         runid is the number of the corsika shower
         runname is in principle the same as runid but with leading zeros and as a string which is then used for file naming
         procnum is the index of the run in the set of given inputs, so the first run that will be processed has procnum 1, no matter what the runid is, the last is my example would be 667
@@ -192,13 +212,13 @@ class ProcessRunner():
             # nproc is the number of files simulated per energy bin obtained by listing all files in the direcory and getting the len of it
             nproc = len([f for f in os.listdir(inDir) if os.path.isfile(os.path.join(inDir,f)) ])
             for index, corsikaFile in enumerate(os.listdir(inDir)):
-                seed = int(DATASET * 100000.0)
                 runID=int(corsikaFile.partition("DAT")[-1][-5:])
                 runname=str(corsikaFile.partition("DAT")[-1])
                 procnum=index+1
-                yield(energy, corsikaFile, runname, nproc, procnum, runID, self.doFiltering,)
+                keyArgs = energy, corsikaFile, runname, nproc, procnum, runID
+                yield (f"{energy}_{runname}", *(keyArgs))
 
-    def run_processes(self, energy, corsikaFile, runname, nproc, procnum, runID,):
+    def run_processes(self, energy, corsikaFile, runname, nproc, procnum, runID):
         """
         This functions can be edited and can be used for running all processes needed that can ebe found in DetectorSimulator
         If your function is not available, add it to the class and run it here. 
@@ -210,7 +230,7 @@ class ProcessRunner():
                                                         nproc=nproc, 
                                                         procnum=procnum, 
                                                         runID=runID, 
-                                                        extraOptions="")
+                                                        extraOptions=self.extraOptions.get("ITSG"))
         if exeFile is not None: 
             print(energy, nproc, "run_ITShowerGenerator")
             self.executeFile(key=f"{energy}_{runname}_ITSG", exeFile=exeFile)        
@@ -220,7 +240,7 @@ class ProcessRunner():
                                             inputFile=ITSGFile, 
                                             nproc=nproc, 
                                             procnum=procnum, 
-                                            extraOptions="", 
+                                            extraOptions=self.extraOptions.get("clsim"), 
                                             oversize=5, 
                                             efficiency=1.0, 
                                             icemodel="spice_3.2.1",)
@@ -235,7 +255,7 @@ class ProcessRunner():
                                             procnum=procnum, 
                                             runID=runID, 
                                             doFiltering=self.doFiltering, 
-                                            extraOptions="", 
+                                            extraOptions=self.extraOptions.get("Det"), 
                                             mcprescale=1, 
                                             mctype="CORSIKA")
         if exeFile is not None: 
@@ -245,7 +265,7 @@ class ProcessRunner():
         exeFile, LV1File = self.detectorSim.run_lv1(energy=energy, 
                                             runname=runname,  
                                         DETFile=DETFile, 
-                                        extraOptions="",)
+                                        extraOptions=self.extraOptions.get("lv1"),)
         if exeFile is not None: 
             print(energy, nproc, "run_lv1")
             self.executeFile(key=f"{energy}_{runname}_lv1", exeFile=exeFile) 
@@ -253,7 +273,7 @@ class ProcessRunner():
         exeFile, LV2File = self.detectorSim.run_lv2(energy=energy, 
                                         runname=runname,  
                                         LV1File=LV1File, 
-                                        extraOptions="",)
+                                        extraOptions=self.extraOptions.get("lv2"),)
         if exeFile is not None: 
             print(energy, nproc, "run_lv2")
             self.executeFile(key=f"{energy}_{runname}_lv2", exeFile=exeFile) 
@@ -262,7 +282,7 @@ class ProcessRunner():
                                         runname=runname, 
                                         LV2File=LV2File, 
                                         runID=runID, 
-                                        extraOptions="",
+                                        extraOptions=self.extraOptions.get("lv3"),
                                         domeff=1.0,)
         if exeFile is not None: 
             print(energy, nproc, "run_lv3")
@@ -275,13 +295,15 @@ class ProcessRunner():
         self.submitter.startSingleProcess(key, exeFile)
         self.submitter.communicateSingleProcess(key)
         return
+
  
 def mainLoop(args):
 
-    energies = np.around(
-        np.arange(args.energyStart, args.energyEnd + args.energyStep, args.energyStep), 
-        decimals=1
-    )
+    energies = np.linspace(
+        args.energyStart, # Start point 
+        args.energyEnd, # End point (excluded)
+        num=int((args.energyEnd-args.energyStart+args.energyStep)/args.energyStep), # Number of points (end-start+step)/step
+        ) 
     
     detectorSim = DetectorSimulator(
         pythonPath=args.pythonPath,
@@ -290,8 +312,8 @@ def mainLoop(args):
         seed=args.seed,
         year=args.year,
         doLv3=args.doLv3,
-        NumbSamples=100,
-        NumbFrames=0,
+        NumbSamples=args.NumbSamples,
+        NumbFrames=args.NumbFrames,
         i3build=args.i3build,
         outDirectory=args.outDirectory,
         detector=args.detector,#"IC86"
@@ -309,12 +331,19 @@ def mainLoop(args):
         submitter=submitter,
         energies=energies,
         inDirectory=args.inDirectory, 
-        doFiltering=args.doFiltering)
-    
-    generator = processRun.generatorKeys(args.dataset)
-    
+        doFiltering=args.doFiltering,
+        extraOptions={
+            "ITSG": args.ITSG_ExtraOptions,
+            "clsim":args.clsim_ExtraOptions,
+            "Det":args.DET_ExtraOptions,
+            "lv1":args.LV1_ExtraOptions,
+            "lv2":args.LV2_ExtraOptions,
+            "lv3":args.LV3_ExtraOptions,
+            }
+        )
+        
     multiProcessor = MultiProcesses(
-        keysGenerator=generator, 
+        keysGenerator=processRun.generatorKeys, 
         functionToRun=processRun.run_processes, 
         parallel_sim=args.parallelSim)
     
@@ -330,4 +359,4 @@ if __name__ == "__main__":
     parser = make_parser()
     mainLoop(args=parser.parse_args())
 
-    print("-------------------- Program finished --------------------")
+    print("------------------- Program finished --------------------")
