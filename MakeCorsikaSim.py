@@ -32,12 +32,14 @@ from utils.Submitter import Submitter
 
 def mainCorsikaSim(args):
     
-    energies = np.linspace(
-        args.energyStart, # Start point 
-        args.energyEnd, # End point (excluded)
-        num=int((args.energyEnd-args.energyStart+args.energyStep)/args.energyStep), # Number of points (end-start+step)/step
-        ) 
-
+    energies = np.around( # Need to round the numpy array otherwise the floating is wrong
+                    np.arange(
+                        args.energyStart, # energy starting point
+                        args.energyEnd + args.energyStep, # energy end point plus one step in order to include last step
+                        args.energyStep, # step in energies
+                        ),
+                decimals=1 # the rounding has to have one single decimal point for the folder. 
+    )
     fW = FileWriter(
         username=args.username,                 # User name on server
         dirSimulations=args.dirSimulations,

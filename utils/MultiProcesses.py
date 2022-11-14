@@ -45,11 +45,11 @@ class MultiProcesses:
         In case the key is not valid, it prints a message to the user.
         """       
         if ((key is None) or (keyArgs is None)):
-            key, *keyArgs = next(self.keysGenerator, (None, None))
+            key, keyArgs = next(self.keysGenerator, (None, None))
             
         if ((key is not None) and (keyArgs is not None)):            
             print("\n==================== New Process ====================")
-            self.processDict[key] = mp.Process(target=self.functionToRun, args=[keyArgs])
+            self.processDict[key] = mp.Process(target=self.functionToRun, args=[*keyArgs])
             self.processDict[key].start()
         # else:
         #     print("No more files in yield")        

@@ -208,15 +208,15 @@ class ProcessRunner():
         """
         
         for energy in self.energies:
-            inDir = f"{self.inDirectory}/{energy}"
+            inDir = f"{self.inDirectory}/{energy}/"
             # nproc is the number of files simulated per energy bin obtained by listing all files in the direcory and getting the len of it
             nproc = len([f for f in os.listdir(inDir) if os.path.isfile(os.path.join(inDir,f)) ])
             for index, corsikaFile in enumerate(os.listdir(inDir)):
                 runID=int(corsikaFile.partition("DAT")[-1][-5:])
                 runname=str(corsikaFile.partition("DAT")[-1])
                 procnum=index+1
-                keyArgs = energy, corsikaFile, runname, nproc, procnum, runID
-                yield (f"{energy}_{runname}", *(keyArgs))
+                keyArgs = [energy, inDir+corsikaFile, runname, nproc, procnum, runID]
+                yield (f"{energy}_{runname}", keyArgs)
 
     def run_processes(self, energy, corsikaFile, runname, nproc, procnum, runID):
         """
@@ -232,7 +232,7 @@ class ProcessRunner():
                                                         runID=runID, 
                                                         extraOptions=self.extraOptions.get("ITSG"))
         if exeFile is not None: 
-            print(energy, nproc, "run_ITShowerGenerator")
+            print(energy, runname, "run_ITShowerGenerator")
             self.executeFile(key=f"{energy}_{runname}_ITSG", exeFile=exeFile)        
         ####################################### clsim ########################################
         exeFile, clsimFile = self.detectorSim.run_clsim(energy=energy, 
@@ -245,7 +245,7 @@ class ProcessRunner():
                                             efficiency=1.0, 
                                             icemodel="spice_3.2.1",)
         if exeFile is not None: 
-            print(energy, nproc, "run_clsim")
+            print(energy, runname, "run_clsim")
             self.executeFile(key=f"{energy}_{runname}_clsim", exeFile=exeFile) 
         ################################# detector ##############################################
         exeFile, DETFile = self.detectorSim.run_detector(energy=energy, 
@@ -259,7 +259,7 @@ class ProcessRunner():
                                             mcprescale=1, 
                                             mctype="CORSIKA")
         if exeFile is not None: 
-            print(energy, nproc, "run_detector")
+            print(energy, runname, "run_detector")
             self.executeFile(key=f"{energy}_{runname}_detector", exeFile=exeFile) 
         ################################### LV1 ############################################
         exeFile, LV1File = self.detectorSim.run_lv1(energy=energy, 
@@ -267,7 +267,7 @@ class ProcessRunner():
                                         DETFile=DETFile, 
                                         extraOptions=self.extraOptions.get("lv1"),)
         if exeFile is not None: 
-            print(energy, nproc, "run_lv1")
+            print(energy, runname, "run_lv1")
             self.executeFile(key=f"{energy}_{runname}_lv1", exeFile=exeFile) 
         ################################## LV2 #############################################
         exeFile, LV2File = self.detectorSim.run_lv2(energy=energy, 
@@ -275,7 +275,7 @@ class ProcessRunner():
                                         LV1File=LV1File, 
                                         extraOptions=self.extraOptions.get("lv2"),)
         if exeFile is not None: 
-            print(energy, nproc, "run_lv2")
+            print(energy, runname, "run_lv2")
             self.executeFile(key=f"{energy}_{runname}_lv2", exeFile=exeFile) 
         #################################### LV3 ###########################################
         exeFile, LV3File = self.detectorSim.run_lv3(energy=energy, 
@@ -285,7 +285,7 @@ class ProcessRunner():
                                         extraOptions=self.extraOptions.get("lv3"),
                                         domeff=1.0,)
         if exeFile is not None: 
-            print(energy, nproc, "run_lv3")
+            print(energy, runname, "run_lv3")
             self.executeFile(key=f"{energy}_{runname}_lv3", exeFile=exeFile) 
         ###############################################################################
         
@@ -299,11 +299,14 @@ class ProcessRunner():
  
 def mainLoop(args):
 
-    energies = np.linspace(
-        args.energyStart, # Start point 
-        args.energyEnd, # End point (excluded)
-        num=int((args.energyEnd-args.energyStart+args.energyStep)/args.energyStep), # Number of points (end-start+step)/step
-        ) 
+    energies = np.around( # Need to round the numpy array otherwise the floating is wrong
+                    np.arange(
+                        args.energyStart, # energy starting point
+                        args.energyEnd + args.energyStep, # energy end point plus one step in order to include last step
+                        args.energyStep, # step in energies
+                        ),
+                decimals=1 # the rounding has to have one single decimal point for the folder. 
+    )
     
     detectorSim = DetectorSimulator(
         pythonPath=args.pythonPath,
