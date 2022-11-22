@@ -39,7 +39,7 @@ class DetectorSimulator():
         self.photonDir = photonDirectory
         self.Lv3GCD = ""
         if doLv3:
-            self.make_Lv3GCD
+            self.Lv3GCD = self.GCD
     
     def make_Lv3GCD(self):
         """
@@ -230,6 +230,8 @@ class DetectorSimulator():
             --inputfilelist {inputFile} \
             --outputfile {tempFile} > {logsFile}.out 2> {logsFile}.err \
             "
+            # 
+            #
             
         if extraOptions:
             cmdOptions+=extraOptions

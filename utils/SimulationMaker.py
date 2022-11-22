@@ -49,24 +49,27 @@ class SimulationMaker:
 
             # This is a way to generate a unique number for each simulation that 
             # can be used as a seed for Corsika
-            binNumber = np.round((log10_E1 - 5) * 10, decimals=1)
-            binArray = np.arange(
-                ((self.startNumber + binNumber) * self.endNumber),
-                ((self.startNumber + binNumber + 1) * self.endNumber + 1),
-                1,
-                np.int,
-            )
+            # binNumber = np.round((log10_E1 - 5) * 10, decimals=1)
+            # binArray = np.arange(
+            #     ((self.startNumber + binNumber) * self.endNumber),
+            #     ((self.startNumber + binNumber + 1) * self.endNumber + 1),
+            #     1,
+            #     np.int,
+            # )
             # It loops over all the unique numbers 
-            for procNumber, runNumber in zip(binArray[:-1], binArray[1:]):
+            # for procNumber, runNumber in zip(binArray[:-1], binArray[1:]):
+            for runIndex in range(self.startNumber, self.endNumber):
                 # Creates the file name for the simulation
-                fileNumber = f"4{runNumber:05d}"
+                #TODO change fileNumber as integer, not sting and add a check in runIndex so that it does not overshots
+                fileNumber = f"{int(10*log10_E1)}{runIndex:04d}"
+                # fileNumber = f"4{runNumber:05d}"
                 # Check if this simulation is not in data. Thus, was already created
                 # There is thus no need to redo it
                 if f"DAT{fileNumber}" not in os.listdir(
                     f"{self.fW.directories['data']}/{log10_E1}/"
                 ):
                     # It writes the Corsika input file 
-                    self.fW.writeFile(procNumber, runNumber, log10_E1, log10_E2)
+                    self.fW.writeFile(fileNumber, log10_E1, log10_E2)
                     # The unique key for the the Submitter is created as followed. 
                     # It has not practical use, nut MUST be unique 
                     key = f"{log10_E1}_{fileNumber}"

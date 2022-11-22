@@ -350,8 +350,8 @@ def mainLoop(args):
         functionToRun=processRun.run_processes, 
         parallel_sim=args.parallelSim)
     
-    if args.doLv3:
-        detectorSim.make_Lv3GCD()
+    # if args.doLv3:
+    #     detectorSim.make_Lv3GCD()
         
     multiProcessor.startProcesses()
     multiProcessor.checkProcesses()
