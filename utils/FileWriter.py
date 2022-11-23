@@ -34,7 +34,6 @@ class FileWriter:
         zenith ={'start': 0.00000000,   # Lower limit of azimuth (do not change unless you know what you are doing)
                  'end': 65.0000000},    # Upper limit of azimuth (do not change unless you know what you are doing)
     ):
-
         self.dataset = dataset
         self.username = username
         self.primary = primary
@@ -56,20 +55,20 @@ class FileWriter:
             pathlib.Path(f"{self.directories[folder]}/{log10_E1}").mkdir(parents=True, exist_ok=True)
         return
     
-    def writeFile(self, procNumber, runNumber, log10_E1, log10_E2):
+    def writeFile(self, fileNumber, log10_E1, log10_E2):
         """
         Creates and writes a Corsika inp file that can be used as Corsika input
         """
         en1 = 10**log10_E1  # Lower limit of energy in GeV
         en2 = 10**log10_E2  # Upper limit of energy in GeV
+        
+        # TODO primaryIdDict must be change and be made more general 
+        runNumber = int(fileNumber)
+        primIdDict = {1: 0, 14: 1, 402: 2, 1608: 3, 5626: 4, 2814: 5}
+        
+        # 1 <= seed <= 900000000; seed has the form pprrrrrr where pp is the primary ID (0, 1, 2...) and rrrrrr is teh 6-digit run number
+        seedValue = int((runNumber + primIdDict[self.primary]*1000000) % 900000001) 
 
-        seedValue = int(
-            (((self.dataset * 100000.0) + (procNumber)) % 100000000.0) + 382710.0
-        )  # changed on 28 Jan 2020 according to IC std
-
-        # fileNumber="{0:06d}".format(runNumber) # We need 6 digits for the run number according to corsika format
-        # We need 6 digits for the run number according to corsika format
-        fileNumber = f"4{runNumber:05d}"
         sim = f"SIM{fileNumber}"
         # This is the inp file, which gets written into the folder
         inp_name = (f"{self.directories['inp']}/{log10_E1}/{sim}.inp")  
@@ -84,7 +83,7 @@ class FileWriter:
             file.write(
                 f"RUNNR   {fileNumber}\n" # Unique run number in the file name of corsika
                 + f"EVTNR   1\n"
-                + f"SEED    {seed1} 0    0\n"  #
+                + f"SEED    {seed1}    0    0\n"  #
                 + f"SEED    {seed2}    0    0\n"  #
                 + f"SEED    {seed3}    0    0\n"  #
                 + f"NSHOW   1\n"
@@ -93,23 +92,24 @@ class FileWriter:
                 + f"PRMPAR  {self.primary}\n"
                 + f"THETAP  {self.zenith['start']}    {self.zenith['end']}\n"  #
                 + f"PHIP    {self.azimuth['start']} {self.azimuth['end']}\n"  #
-                + f"ECUTS    0.0500 0.0500 0.0100 0.0020\n"
-                + f"ELMFLG  T    T\n"
+                + f"ECUTS   0.0500 0.0500 0.0100 0.0020\n"
+                + f"ELMFLG  F    T\n"   # Disable NKG since it gets deactivated anyway when CURVED is selected at corsika setup
                 + f"OBSLEV  2840.E2\n"  # changed from 2837 m to 2840 m on 26 Nov 2019
                 + f"ECTMAP  100\n"
                 + f"SIBYLL  T    0\n"  # Keep this only if we are running sibyll
                 + f"SIBSIG  T\n"  # Keep this only if we are running sibyll                
+                + f"SIBCHM  T\n"  # Enable charm production with Sibyll
                 + f"ARRANG  -120.7\n"  #Rotates the output from corika to IC coordinates # changed Nov 26 2019
                 + f"HADFLG  0    1    0    1    0    2\n"
                 + f"STEPFC  1.0\n"
-                + f"DEBUG  F    6    F    1000000\n"
+                + f"DEBUG   F    6    F    1000000\n"
                 + f"MUMULT  T\n"
                 + f"MUADDI  T\n"
                 + f"MAXPRT  0\n"
                 + f"MAGNET  16.75       -51.96\n"  # changed on Nov 26 2019                
-                + f"LONGI   T   20.     T       F\n"  # 10 to 20 g/cm2 and last column T to F on 26 Nov 2019
+                + f"LONGI   T   10.     T       T\n"
                 + f"RADNKG  2.E5\n"                
-                + f"ATMOD   33\n"  # real atmosphere changed # updated on 10.10.2022 as Agnieszka suggested
+                + f"ATMOD   33\n"  # real atmosphere (April avg. is used here)
                 + f"DIRECT  {self.directories['temp']}/{log10_E1}/{fileNumber}\n"
                 + f"USER    {self.username}\n"
                 + f"EXIT\n")
