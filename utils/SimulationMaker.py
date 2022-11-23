@@ -47,46 +47,39 @@ class SimulationMaker:
             # Creates "data", "temp", "log", "inp" folders and energy subfolder
             self.fW.makeFolders(log10_E1)
 
-            # This is a way to generate a unique number for each simulation that 
-            # can be used as a seed for Corsika
-            # binNumber = np.round((log10_E1 - 5) * 10, decimals=1)
-            # binArray = np.arange(
-            #     ((self.startNumber + binNumber) * self.endNumber),
-            #     ((self.startNumber + binNumber + 1) * self.endNumber + 1),
-            #     1,
-            #     np.int,
-            # )
             # It loops over all the unique numbers 
             # for procNumber, runNumber in zip(binArray[:-1], binArray[1:]):
             for runIndex in range(self.startNumber, self.endNumber):
                 # Creates the file name for the simulation
-                #TODO change fileNumber as integer, not sting and add a check in runIndex so that it does not overshots
-                fileNumber = f"{int(10*log10_E1)}{runIndex:04d}"
-                # fileNumber = f"4{runNumber:05d}"
+                # The runNumber is calculated as follows:
+                # EEiiii where EE is the energy in log10/GeV *10 
+                # and iiii is the run index number. 
+                runNumber = int(log10_E1 * 10 * 10_000 + runIndex)
+                
                 # Check if this simulation is not in data. Thus, was already created
                 # There is thus no need to redo it
-                if f"DAT{fileNumber}" not in os.listdir(
+                if f"DAT{runNumber}" not in os.listdir(
                     f"{self.fW.directories['data']}/{log10_E1}/"
                 ):
                     # It writes the Corsika input file 
-                    self.fW.writeFile(fileNumber, log10_E1, log10_E2)
+                    self.fW.writeFile(runNumber, log10_E1, log10_E2)
                     # The unique key for the the Submitter is created as followed. 
                     # It has not practical use, nut MUST be unique 
-                    key = f"{log10_E1}_{fileNumber}"
+                    key = f"{log10_E1}_{runNumber}"
                     # It calls the function to create a sting which will be used for the job execution
-                    stringToSubmit = self.makeStringToSubmit(log10_E1, fileNumber)
+                    stringToSubmit = self.makeStringToSubmit(log10_E1, runNumber)
                     yield (key, stringToSubmit)
 
-    def makeStringToSubmit(self, log10_E, fileNumber):
+    def makeStringToSubmit(self, log10_E, runNumber):
         # A few paths to files are defined. 
-        inpFile = f"{self.fW.directories['inp']}/{log10_E}/SIM{fileNumber}.inp" # input file
-        logFile = f"{self.fW.directories['log']}/{log10_E}/DAT{fileNumber}.log" # log file 
+        inpFile = f"{self.fW.directories['inp']}/{log10_E}/SIM{runNumber}.inp" # input file
+        logFile = f"{self.fW.directories['log']}/{log10_E}/DAT{runNumber}.log" # log file 
         # The move command which moves the file from the temporary directory to the data directory 
         # when the simulation is completed
-        mvCommand = f"mv {self.fW.directories['temp']}/{log10_E}/{fileNumber}DAT{fileNumber} {self.fW.directories['data']}/{log10_E}/DAT{fileNumber}"
+        mvCommand = f"mv {self.fW.directories['temp']}/{log10_E}/{runNumber}DAT{runNumber} {self.fW.directories['data']}/{log10_E}/DAT{runNumber}"
 
         # Makes a temp file for the execution of corsika.
-        tempFile = f"{self.fW.directories['temp']}/{log10_E}/temp_{fileNumber}.sh"
+        tempFile = f"{self.fW.directories['temp']}/{log10_E}/temp_{runNumber}.sh"
         with open(tempFile, "w") as f:
             f.write(r"#!/bin/sh") # This shows that the file is an executable
             f.write(

@@ -28,7 +28,9 @@ class FileWriter:
         dirSimulations,                 # Simulations directory where the data temp and log folder will be created
         primary,                        # 1 is gamma, 14 is proton, 402 is He, 1608 is Oxygen, 5626 is Fe
         dataset,                        # changed on 28 Jan 2020 according to IC std: 13000.0 +000 H, +100 He, +200 O, +300 Fe, +400 Gamma
-  
+        primIdDict,                     # This is a dictionary, with keys the Corsika numbering of primary, 
+                                        # and values the arbitrary numbering used in this script for all primary particle. 
+        
         azimuth={'start': 0.00000000,   # Lower limit of zenith (do not change unless you know what you are doing)
                  'end': 359.99000000},  # Upper limit of zenith (do not change unless you know what you are doing)
         zenith ={'start': 0.00000000,   # Lower limit of azimuth (do not change unless you know what you are doing)
@@ -38,6 +40,7 @@ class FileWriter:
         self.username = username
         self.primary = primary
         self.directories = {"sim":dirSimulations}
+        self.primIdDict= primIdDict
         
         self.azimuth = azimuth
         self.zenith = zenith
@@ -55,21 +58,21 @@ class FileWriter:
             pathlib.Path(f"{self.directories[folder]}/{log10_E1}").mkdir(parents=True, exist_ok=True)
         return
     
-    def writeFile(self, fileNumber, log10_E1, log10_E2):
+    def writeFile(self, runNumber, log10_E1, log10_E2):
         """
         Creates and writes a Corsika inp file that can be used as Corsika input
         """
         en1 = 10**log10_E1  # Lower limit of energy in GeV
-        en2 = 10**log10_E2  # Upper limit of energy in GeV
+        en2 = 10**log10_E2  # Upper limit of energy in GeV    
         
-        # TODO primaryIdDict must be change and be made more general 
-        runNumber = int(fileNumber)
-        primIdDict = {1: 0, 14: 1, 402: 2, 1608: 3, 5626: 4, 2814: 5}
-        
-        # 1 <= seed <= 900000000; seed has the form pprrrrrr where pp is the primary ID (0, 1, 2...) and rrrrrr is teh 6-digit run number
-        seedValue = int((runNumber + primIdDict[self.primary]*1000000) % 900000001) 
+        # The seed value in Corsika is 1 <= seed <= 900_000_000; 
+        # It was decided to adopt the following seed has the form: 
+        # pprrrrrr where pp is the primary ID (0, 1, 2...) and rrrrrr is teh 6-digit run number
+        # The seedValue is % 900.000.000 so that it does not exceed the max allowed seed value in Corsika
+        # Note underscore do not change anything in the python numbers, they just make them easier to read
+        seedValue = int((runNumber + self.primIdDict[self.primary]*1_000_000) % 900_000_001) 
 
-        sim = f"SIM{fileNumber}"
+        sim = f"SIM{runNumber}"
         # This is the inp file, which gets written into the folder
         inp_name = (f"{self.directories['inp']}/{log10_E1}/{sim}.inp")  
         
@@ -81,7 +84,7 @@ class FileWriter:
         with open(inp_name, "w") as file:
             ######Things that go into the input files for corsika#######
             file.write(
-                f"RUNNR   {fileNumber}\n" # Unique run number in the file name of corsika
+                f"RUNNR   {runNumber}\n" # Unique run number in the file name of corsika
                 + f"EVTNR   1\n"
                 + f"SEED    {seed1}    0    0\n"  #
                 + f"SEED    {seed2}    0    0\n"  #
@@ -110,6 +113,6 @@ class FileWriter:
                 + f"LONGI   T   10.     T       T\n"
                 + f"RADNKG  2.E5\n"                
                 + f"ATMOD   33\n"  # real atmosphere (April avg. is used here)
-                + f"DIRECT  {self.directories['temp']}/{log10_E1}/{fileNumber}\n"
+                + f"DIRECT  {self.directories['temp']}/{log10_E1}/{runNumber}\n"
                 + f"USER    {self.username}\n"
                 + f"EXIT\n")
