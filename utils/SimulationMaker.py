@@ -84,9 +84,13 @@ class SimulationMaker:
             f.write(r"#!/bin/sh") # This shows that the file is an executable
             f.write(
                 f"\ncd {self.pathCorsika}" # You must execute corsica in its folder. Otherwise returns an error
-                + f"\n{self.pathCorsika}/{self.corsikaExe} < {inpFile} > {logFile}" # This is how you execute a corsika file 
+                # You must delete corsica non completed files. Otherwise returns an error and exits without executing the file 
+                + f"\nrm {self.fW.directories['temp']}/{log10_E}/{runNumber}DAT{runNumber}" # Removes the non-completed simulation file if already existing
+                + f"\nrm {self.fW.directories['temp']}/{log10_E}/{runNumber}DAT{runNumber}.long" # Removes the non-completed long file if already existing
+                + f"\nrm {logFile}" # Removes the non-completed log file if already existing
+                + f"\n{self.pathCorsika}/{self.corsikaExe} < {inpFile} > {logFile}" # This is how you execute a corsika file
                 + f"\n{mvCommand}" # Move the file form temp directory to the data directory
-                + f"\nrm {tempFile}" # It removes this temporary file since it is not needed anymore 
+                + f"\nrm {tempFile}" # It removes this temporary file since it is not needed anymore
             )
 
         # Make the file executable

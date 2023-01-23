@@ -54,7 +54,17 @@ class DetectorSimulator():
         if not os.path.isfile(self.Lv3GCD):            
             print("Making the GCD file")
             os.system(f"{self.pythonPath} {self.i3build}/icetop_Level3_scripts/resources/scripts/MakeL3GCD_MC.py --MCgcd {self.GCD} --obslevel 2840. --output {self.Lv3GCD}")
-            
+
+    def checkIfInputExists(self, inputFile):
+        """
+        Checks if the input file exists, if not a working message is shown
+        """
+        fileToCheck = pathlib.Path(inputFile)
+        if not fileToCheck.is_file():        
+            import warnings
+            warnings.warn(f"\nThe program is not stopped, but be aware that: \n{inputFile} \nDOES NOT EXIST!!")    
+        return
+
     def writeSHexeFile(self, exeFile, cmdPython, cmdOptions, cmdMoveFile, cmdSTART= "", cmdEND=""):
         """
         Writes the executable file and makes it executable.
@@ -140,6 +150,7 @@ class DetectorSimulator():
         Return:
             exeFile: the file that need to be executed
         """
+        self.checkIfInputExists(inputFile)
         outputFolder=f"{self.outDirectory}/generated/topsimulator"
         outputFolder+=f"/TopSimulator_{self.detector}_corsika_icetop.{self.MCdataset}/"
                 
@@ -196,6 +207,7 @@ class DetectorSimulator():
             efficiency=1.0,
             icemodel="spice_3.2.1",
         ):
+        self.checkIfInputExists(inputFile)
         
         icemodellocation=f"{self.i3build}/ice-models/resources/models/ICEMODEL"
         holeiceparametrization=f"{self.i3build}/ice-models/resources/models/ANGSENS/angsens_flasher/as.9"
@@ -245,8 +257,10 @@ class DetectorSimulator():
     def run_detector(self, energy, runname, inputFile, nproc, procnum, runID, doFiltering,
             extraOptions="",
             mcprescale=1,
-            mctype="CORSIKA"):
-            
+            mctype="CORSIKA",
+            ):
+        
+        self.checkIfInputExists(inputFile)
         
         outputFolder=f"{self.outDirectory}/generated/detector"
         outputFolder+=f"/Detector_{self.detector}_corsika_icetop.{self.MCdataset}/"        
@@ -298,6 +312,7 @@ class DetectorSimulator():
         
     def run_lv1(self, energy, runname, DETFile, extraOptions="",):        
         
+        self.checkIfInputExists(DETFile)
         outputFolder=f"{self.outDirectory}/filtered/level1"
         outputFolder+=f"/Level1_{self.detector}_corsika_icetop.{self.MCdataset}/"        
                 
@@ -319,9 +334,8 @@ class DetectorSimulator():
             --needs_wavedeform_spe_corr \
             --photonicsdir {self.photonDir} \
             -g {self.GCD} \
-            -i \
-            --inputfile {DETFile} \
-            --outputfile {tempFile} > {logsFile}.out 2> {logsFile}.err \
+            -i {DETFile} \
+            -o {tempFile} > {logsFile}.out 2> {logsFile}.err \
             "
             
         if self.NumbFrames:
@@ -339,6 +353,7 @@ class DetectorSimulator():
     
     def run_lv2(self, energy, runname, LV1File, extraOptions="",):
         
+        self.checkIfInputExists(LV1File)
         outputFolder=f"{self.outDirectory}/filtered/level2"
         outputFolder+=f"/Level2_{self.detector}_corsika_icetop.{self.MCdataset}/"        
                 
@@ -353,14 +368,14 @@ class DetectorSimulator():
             return None, LV2dataFile
         
         self.make_folders(outputFolder, energy)
-        cmdPython = f"{self.pythonPath} {self.i3build}/filterscripts/resources/scripts/process.py "
+        cmdPython = f"{self.pythonPath} {self.i3build}/filterscripts/resources/scripts/offlineL2/process.py "
                 
         cmdOptions = f"\
             --photonicsdir {self.photonDir} \
             -g {self.GCD} \
             -s \
-            --inputfile {LV1File} \
-            --outputfile {tempFile} > {logsFile}.out 2> {logsFile}.err \
+            -i {LV1File} \
+            -o {tempFile} > {logsFile}.out 2> {logsFile}.err \
             "
         
         if self.NumbFrames:
@@ -376,9 +391,10 @@ class DetectorSimulator():
         # Execute LV1 via submitter 
         return exeFile, LV2dataFile 
 
-    def run_lv3(self, energy, runname, LV2File, runID, extraOptions="",
+    def run_lv3(self, energy, runname, LV2File, runID, extraOptions="", 
         domeff=1.0,):
         
+        self.checkIfInputExists(LV2File)
         if not os.path.isfile(self.Lv3GCD):
             raise SystemExit('The Lv3_GCD file has not been created. \nMake sure to do it before running the lv3 reconstruction')
         
@@ -398,23 +414,23 @@ class DetectorSimulator():
         
         self.make_folders(outputFolder, energy)
         
-        cmdPython = f"{self.pythonPath} {self.i3build}/icetop_Level3_scripts/resources/scripts/level3_IceTop_InIce.py "
+        cmdPython = f"{self.pythonPath} {self.i3build}/icetop_Level3_scripts/resources/scripts/level3_iceprod.py "
         cmdOptions = f"\
-            -m \
+            -d {self.detector} \
+            --isMC \
             --waveforms \
             --spe-corr \
-            --dataset={self.dataset} \
-            -d Lv3_{self.detector} \
             --do-inice \
-            --domeff {domeff} \
             --print-usage \
-            --L2-gcdfile={self.GCD} \
-            --L3-gcdfile={self.Lv3GCD}\
-            --run={runID} \
-            -i\
-            --inputfile {LV2File} \
-            --outputfile {tempFile} > {logsFile}.out 2> {logsFile}.err \
+            --photonicsdir {self.photonDir} \
+            --dataset {self.dataset} \
+            --run {runID} \
+            -o {tempFile} > {logsFile}.out 2> {logsFile}.err \
+            {self.GCD} {LV2File} \
             "
+            # --domeff {domeff} \ #TODO Why no domeff?
+            # --L2-gcdfile {self.GCD} \
+            # --L3-gcdfile {self.Lv3GCD} \
         
         if self.NumbFrames:
             cmdOptions+=f"-n {self.NumbFrames} "

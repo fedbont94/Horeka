@@ -81,7 +81,7 @@ class Submitter:
             keyToLoop = self.singleCheck()            
             # Waits before restarting the loop.
             # This is done to avoid overloading the CPU with useless checks 
-            sleepTime = 10
+            sleepTime = 10 # seconds
             time.sleep(sleepTime)
         return
 

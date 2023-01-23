@@ -1,12 +1,12 @@
 #!/bin/bash
-#SBATCH --job-name=PhotonCorsikaSimulation
-#SBATCH --output=/home/hk-project-pevradio/rn8463/logCorsikaGamma/_log%a.out
-#SBATCH --error=/home/hk-project-pevradio/rn8463/logCorsikaGamma/_log%a.err
+#SBATCH --job-name=PhotonDetectorResponse
+#SBATCH --output=/home/hk-project-pevradio/rn8463/logDetResponse/_log%a.out
+#SBATCH --error=/home/hk-project-pevradio/rn8463/logDetResponse/_log%a.err
 #SBATCH --nodes=1
-#SBATCH --time=0-00:03:00
+#SBATCH --time=2-00:00:00
 #SBATCH --tasks=2
-#SBATCH --mem=3gb
+#SBATCH --mem=100gb
 #SBATCH --export=NONE
-#SBATCH --gres=gpu:1
+#SBATCH --gres=gpu:4
 
-detectorResponse.sh
+/home/hk-project-pevradio/rn8463/simulations_scripts/detector_response.sh
