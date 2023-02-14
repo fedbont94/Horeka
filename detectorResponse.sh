@@ -19,7 +19,7 @@ $ENV $PYTHON $SCRIPT \
                 -doLv3 \
                 -doFiltering \
                 -energyStart 6.0 \
-                -energyEnd 6.1 \
+                -energyEnd 7.1 \
                 -energyStep 0.1 \
                 -logDirProcesses "/home/hk-project-pevradio/rn8463/logDetResponse/" \
                 -parallelSim 1 \

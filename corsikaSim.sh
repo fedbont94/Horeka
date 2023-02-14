@@ -13,19 +13,19 @@ $PYTHON $SCRIPT \
                 --username rn8463 \
                 --primary 1 \
                 --dataset 14000.0 \
-                --dirSimulations "/home/hk-project-pevradio/rn8463/gamma_simulations/corsika/" \
+                --dirSimulations "/hkfs/work/workspace/scratch/rn8463-gamma_simulations/corsika/" \
                 --pathCorsika "/home/hk-project-pevradio/rn8463/corsika/corsika-77420/run/" \
                 --corsikaExe "corsika77420Linux_SIBYLL_flukainfn" \
                 --startNumber 0 \
                 --endNumber 1000 \
-                --energyStart 5.0 \
-                --energyEnd 7.0 \
+                --energyStart 4.0 \
+                --energyEnd 8.0 \
                 --energyStep 0.1 \
                 --azimuthStart 0.00000000 \
                 --azimuthEnd 359.99000000 \
                 --zenithStart 0.00000000 \
                 --zenithEnd 65.0000000 \
-                --logDirProcesses "/home/hk-project-pevradio/rn8463/logCorsikaGamma/" \
-                --parallelSim 120
+                --logDirProcesses "/home/hk-project-pevradio/rn8463/logCorsikaGamma4080/" \
+                --parallelSim 140
 
 # "/lsdf/kit/ikp/projects/IceCube/sim/gamma-sim/" \

@@ -5,13 +5,16 @@ README.md multiple corsika simulations on Horeka
 @date: October 2022
 -------------------------------------------------------------------------------
 
-This folder contains all the necessary scripts to run a multiple corsika simulations in a single submission.
+This folder contains all the necessary scripts to run a multiple corsika simulations and detector response simulations in a single submission.
 
 How to submit a job to the cluster:\
 ./ExecuteSubFile.sh
 
-How to run the python script:\
+How to run the corsika simulation python script:\
 python3 MakeCorsikaSim.py [--args] # as shown in SubFile.sub
+
+How to run the detector resposne simulation python script:\
+python3 MakeDetectorResponse.py [--args] # as shown in SubFile.sub
 
 Summary:\
 README.md -         This file
@@ -23,6 +26,7 @@ SubFile.sub -       Contains all the requests in terms of memory, time, node... 
                     It calls the python script with all arguments that need to be passed and MUST be adapted to your interests.
 
 MakeCorsikaSim.py - Is the main script that for Corsika air shower simulation (more documentation in the script)
+MakeDetectorResponse.py - Is the main script that for detector response simulation (more documentation in the script)
 
 
 utils/FileWriter.py -       Contains a class that can be used to create and write a Corsika inp file and create "data", "temp", "log", "inp" folders. \
@@ -30,4 +34,11 @@ utils/FileWriter.py -       Contains a class that can be used to create and writ
 utils/SimulationMaker.py -  Contains a class that can be used for generating the submission stings and sh executable files. \
                             It also has the generator function which yields the keys and string to submit, 
                             made via the combinations of file and energies \
+                            (more documentation in the script)
 utils/Submitter.py -        Contains a class that can be used to spawns subprocesses for multiple instances instead of multiple job submissions.
+                            (more documentation in the script)
+
+utils/DetectorSimulator.py - Contains a class that can be used to simulate the detector response for a given corsika file. \
+                            (more documentation in the script)
+utils/MultiProcesses.py -   Contains a class that can be used to spawn multiple processes for the detector response simulation. \
+                            (more documentation in the script)
