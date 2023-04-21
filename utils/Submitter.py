@@ -61,6 +61,7 @@ class Submitter:
 
         if (key is not None) and (processString is not None):
             print("\n==================== New Process ====================")
+            print(key)
             self.processDict[key] = subprocess.Popen(
                 processString.split(),
                 stderr=subprocess.PIPE,

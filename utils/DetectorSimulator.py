@@ -141,7 +141,7 @@ class DetectorSimulator:
         pathlib.Path(f"{folder}/data/{energy}/").mkdir(parents=True, exist_ok=True)
         pathlib.Path(f"{folder}/temp/{energy}/").mkdir(parents=True, exist_ok=True)
         pathlib.Path(f"{folder}/logs/{energy}/").mkdir(parents=True, exist_ok=True)
-        pathlib.Path(f"{folder}/inps/{energy}/").mkdir(parents=True, exist_ok=True)
+        # pathlib.Path(f"{folder}/inps/{energy}/").mkdir(parents=True, exist_ok=True)
 
     def get_radius(self, logE):
         """
@@ -205,7 +205,7 @@ class DetectorSimulator:
         logsFile = (
             f"{outputFolder}/logs/{energy}/{runname}"  # ERR and OUT file destination
         )
-        exeFile = f"{outputFolder}/inps/{energy}/{runname}.sh"  # Path where the input file needs to be written
+        exeFile = f"{outputFolder}/temp/{energy}/{runname}.sh"  # Path where the input file needs to be written
 
         # Checks if the file already exist, in case so it returns None
         if os.path.isfile(ITSGdataFile):
@@ -293,7 +293,7 @@ class DetectorSimulator:
         logsFile = (
             f"{outputFolder}/logs/{energy}/{runname}"  # ERR and OUT file destination
         )
-        exeFile = f"{outputFolder}/inps/{energy}/{runname}.sh"  # Path where the input file needs to be written
+        exeFile = f"{outputFolder}/temp/{energy}/{runname}.sh"  # Path where the input file needs to be written
 
         # Checks if the file already exist, in case so it returns None
         if os.path.isfile(polyplopiaDataFile):
@@ -374,7 +374,7 @@ class DetectorSimulator:
         logsFile = (
             f"{outputFolder}/logs/{energy}/{runname}"  # ERR and OUT file destination
         )
-        exeFile = f"{outputFolder}/inps/{energy}/{runname}.sh"  # Path where the input file needs to be written
+        exeFile = f"{outputFolder}/temp/{energy}/{runname}.sh"  # Path where the input file needs to be written
 
         # Checks if the file already exist, in case so it returns None
         if os.path.isfile(CLSdataFile):
@@ -456,7 +456,7 @@ class DetectorSimulator:
         logsFile = (
             f"{outputFolder}/logs/{energy}/{runname}"  # ERR and OUT file destination
         )
-        exeFile = f"{outputFolder}/inps/{energy}/{runname}.sh"  # Path where the input file needs to be written
+        exeFile = f"{outputFolder}/temp/{energy}/{runname}.sh"  # Path where the input file needs to be written
 
         # Checks if the file already exist, in case so it returns None
         if os.path.isfile(DETdataFile):
@@ -532,7 +532,7 @@ class DetectorSimulator:
         logsFile = (
             f"{outputFolder}/logs/{energy}/{runname}"  # ERR and OUT file destination
         )
-        exeFile = f"{outputFolder}/inps/{energy}/{runname}.sh"  # Path where the executable file will to be written
+        exeFile = f"{outputFolder}/temp/{energy}/{runname}.sh"  # Path where the executable file will to be written
 
         # Checks if the file already exist, if so it there is no need to redo it.
         # It will return None and the file, which will be used as input for the next process
@@ -598,7 +598,7 @@ class DetectorSimulator:
         logsFile = (
             f"{outputFolder}/logs/{energy}/{runname}"  # ERR and OUT file destination
         )
-        exeFile = f"{outputFolder}/inps/{energy}/{runname}.sh"  # Path where the executable file will to be written
+        exeFile = f"{outputFolder}/temp/{energy}/{runname}.sh"  # Path where the executable file will to be written
 
         # Checks if the file already exist, if so it there is no need to redo it.
         # It will return None and the file, which will be used as input for the next process
@@ -670,7 +670,7 @@ class DetectorSimulator:
         logsFile = (
             f"{outputFolder}/logs/{energy}/{runname}"  # ERR and OUT file destination
         )
-        exeFile = f"{outputFolder}/inps/{energy}/{runname}.sh"  # Path where the executable file will to be written
+        exeFile = f"{outputFolder}/temp/{energy}/{runname}.sh"  # Path where the executable file will to be written
 
         # Checks if the file already exist, if so it there is no need to redo it.
         # It will return None and the file, which will be used as input for the next process

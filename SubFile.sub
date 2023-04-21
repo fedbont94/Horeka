@@ -1,12 +1,13 @@
 #!/bin/bash
-#SBATCH --job-name=PhotonDetectorResponse
-#SBATCH --output=/home/hk-project-pevradio/rn8463/logDetResponse/_log%a.out
-#SBATCH --error=/home/hk-project-pevradio/rn8463/logDetResponse/_log%a.err
+#SBATCH --job-name=GRANDmagic
+#SBATCH --output=/home/hk-project-radiohfi/bg5912/work/sims/GRAND/proton_test_gp13+stshp/logs/_log%a.out
+#SBATCH --error=/home/hk-project-radiohfi/bg5912/work/sims/GRAND/proton_test_gp13+stshp/logs/_log%a.err
 #SBATCH --nodes=1
-#SBATCH --time=0-01:00:00
+#SBATCH --time=06:00:00
 #SBATCH --tasks=2
-#SBATCH --mem=10gb
+#SBATCH --mem=50gb
 #SBATCH --export=NONE
 #######################SBATCH --gres=gpu:4
 
-/home/hk-project-pevradio/rn8463/simulations_scripts/corsikaSim.sh
+/home/hk-project-radiohfi/bg5912/Horeka/corsikaSim.sh
+# home/hk-project-radiohfi/bg5912/simulations_scripts/corsikaSim.sh

@@ -54,7 +54,7 @@ class SimulationMaker:
                 # The runNumber is calculated as follows:
                 # EEiiii where EE is the energy in log10/GeV *10 
                 # and iiii is the run index number. 
-                runNumber = int(log10_E1 * 10 * 10_000 + runIndex)
+                runNumber = int(log10_E1 * 10_000 + runIndex)
                 
                 # Check if this simulation is not in data. Thus, was already created
                 # There is thus no need to redo it
@@ -76,21 +76,27 @@ class SimulationMaker:
         logFile = f"{self.fW.directories['log']}/{log10_E}/DAT{runNumber}.log" # log file 
         # The move command which moves the file from the temporary directory to the data directory 
         # when the simulation is completed
-        mvCommand = f"mv {self.fW.directories['temp']}/{log10_E}/{runNumber}DAT{runNumber} {self.fW.directories['data']}/{log10_E}/DAT{runNumber}"
-
+        mvDATfiles = f"mv {self.fW.directories['inp']}/{log10_E}/DAT{runNumber} {self.fW.directories['data']}/{log10_E}/DAT{runNumber}"
+        
         # Makes a temp file for the execution of corsika.
         tempFile = f"{self.fW.directories['temp']}/{log10_E}/temp_{runNumber}.sh"
         with open(tempFile, "w") as f:
             f.write(r"#!/bin/sh") # This shows that the file is an executable
             f.write(
-                f"\ncd {self.pathCorsika}" # You must execute corsica in its folder. Otherwise returns an error
-                # You must delete corsica non completed files. Otherwise returns an error and exits without executing the file 
-                + f"\nrm {self.fW.directories['temp']}/{log10_E}/{runNumber}DAT{runNumber}" # Removes the non-completed simulation file if already existing
-                + f"\nrm {self.fW.directories['temp']}/{log10_E}/{runNumber}DAT{runNumber}.long" # Removes the non-completed long file if already existing
+                f"\ncd {self.pathCorsika}" # You must execute corsika in its folder. Otherwise returns an error
+                # You must delete corsika non completed files. Otherwise returns an error and exits without executing the file 
+                + f"\nrm {self.fW.directories['inp']}/{log10_E}/DAT{runNumber}" # Removes the non-completed simulation file if already existing
+                + f"\nrm {self.fW.directories['inp']}/{log10_E}/DAT{runNumber}.long" # Removes the non-completed long file if already existing
                 + f"\nrm {logFile}" # Removes the non-completed log file if already existing
-                + f"\n{self.pathCorsika}/{self.corsikaExe} < {inpFile} > {logFile}" # This is how you execute a corsika file
-                + f"\n{mvCommand}" # Move the file form temp directory to the data directory
-                + f"\nrm {tempFile}" # It removes this temporary file since it is not needed anymore
+                # remove old radio files created by corsika
+                + f"\nrm -r {self.fW.directories['inp']}/{log10_E}/SIM{runNumber}_coreas"
+                + f"\nrm {self.fW.directories['inp']}/{log10_E}/SIM{runNumber}_coreas.bins"
+                # TODO check if you use mpi or not - the commands for executing corsika are different
+                # + f"\n{self.pathCorsika}/{self.corsikaExe} < {inpFile} > {logFile}" # This is how you execute a corsika file
+                + f"\n mpirun -n 72 --bind-to core:overload-allowed --map-by core -report-bindings {self.pathCorsika}/{self.corsikaExe} {inpFile} > {logFile}" # This is how you execute an mpi corsika file
+                + f"\n{mvDATfiles}" # Move the DAT files from inp directory to the data directory
+                # + f"\nrm {tempFile}" # It removes this temporary file since it is not needed anymore
+                + f"\n "
             )
 
         # Make the file executable
