@@ -155,40 +155,34 @@ def make_parser():
     )
     ############################# Scripts Extra Options #####################################
     parser.add_argument(
-        "--ITSG_ExtraOptions",
-        type=str,
-        default="",
-        help="  Enquoted other options for icetopsimulator.py; example: -o --raise-observation-level 3",
+        "--doITSG",
+        action="store_true",
+        help="do you want to run ITShowerGenerator.py? deafualt: False",
     )
     parser.add_argument(
-        "--clsim_ExtraOptions",
-        type=str,
-        default="",
-        help="  Enquoted other options for clsim.py; example: -o --raise-observation-level 3",
+        "--doCLSIM",
+        action="store_true",
+        help="do you want to run clsim.py? deafualt: False",
     )
     parser.add_argument(
-        "--DET_ExtraOptions",
-        type=str,
-        default="",
-        help="  Enquoted other options for detector.py (level 0 simulation)",
+        "--doDET",
+        action="store_true",
+        help="do you want to run detector.py? deafualt: False",
     )
     parser.add_argument(
-        "--LV1_ExtraOptions",
-        type=str,
-        default="",
-        help="  Enquoted other options for SimulationFiltering.py (level 1 simulation)",
+        "--doLV1",
+        action="store_true",
+        help="do you want to run SimulationFiltering.py? (level 1 simulation) deafualt: False",
     )
     parser.add_argument(
-        "--LV2_ExtraOptions",
-        type=str,
-        default="",
-        help="  Enquoted other options for process.py (level 2 simulation)",
+        "--doLV2",
+        action="store_true",
+        help="do you want to run the process.py? (level 2 simulation) deafualt: False",
     )
     parser.add_argument(
-        "--LV3_ExtraOptions",
-        type=str,
-        default="",
-        help="Enquoted other options for level3_iceprod.py (level 3 simulation); available only if -a is declared",
+        "--doLV3",
+        action="store_true",
+        help="do you want to run level3_iceprod.py? (level 3 simulation) deafualt: False",
     )
     return parser
 
@@ -243,6 +237,8 @@ class ProcessRunner:
             nproc = len(fileList)
             # loop over all files in the directory
             for index, corsikaFile in enumerate(fileList):
+                if corsikaFile.endswith(".bz2"):
+                    continue
                 runID = int(corsikaFile.partition("DAT")[-1][-5:])
                 runname = str(corsikaFile.partition("DAT")[-1])
                 procnum = index + 1
@@ -255,83 +251,115 @@ class ProcessRunner:
         If your function is not available, add it to the class and run it here.
         """
         ##################################### ITShowerGenerator ##########################################
-        exeFile, ITSGFile = self.detectorSim.run_ITShowerGenerator(
-            energy=energy,
-            runname=runname,
-            inputFile=corsikaFile,
-            nproc=nproc,
-            procnum=procnum,
-            runID=runID,
-            extraOptions=self.extraOptions.get("ITSG"),
-        )
-        if exeFile is not None:
-            print(energy, runname, "run_ITShowerGenerator")
-            self.executeFile(key=f"{energy}_{runname}_ITSG", exeFile=exeFile)
-        inputFile = ITSGFile
-        ####################################### clsim ########################################
-        exeFile, clsimFile = self.detectorSim.run_clsim(
-            energy=energy,
-            runname=runname,
-            inputFile=inputFile,
-            nproc=nproc,
-            procnum=procnum,
-            extraOptions=self.extraOptions.get("clsim"),
-            oversize=5,
-            efficiency=1.0,
-            icemodel="spice_3.2.1",
-        )
-        if exeFile is not None:
-            print(energy, runname, "run_clsim")
-            self.executeFile(key=f"{energy}_{runname}_clsim", exeFile=exeFile)
-        inputFile = clsimFile
+        if self.extraOptions.get("doITSG"):
+            exeFile, ITSGFile = self.detectorSim.run_ITShowerGenerator(
+                energy=energy,
+                runname=runname,
+                inputFile=corsikaFile,
+                nproc=nproc,
+                procnum=procnum,
+                runID=runID,
+            )
+            if exeFile is not None:
+                print(energy, runname, "run_ITShowerGenerator")
+                self.executeFile(key=f"{energy}_{runname}_ITSG", exeFile=exeFile)
+            inputFile = ITSGFile
+        if self.extraOptions.get("doCLSIM"):
+            ####################################### corsika #################################################
+            exeFile, corsikaBgFile = self.detectorSim.run_corsikaBg(
+                energy=energy,
+                runname=runname,
+                nproc=nproc,
+                procnum=procnum,
+                CORSIKA_samples=100,
+            )
+            if exeFile is not None:
+                print(energy, runname, "run_CorsikaBg")
+                self.executeFile(key=f"{energy}_{runname}_CorsikaBg", exeFile=exeFile)
+
+            ####################################### polyplopia #############################################
+            exeFile, polyplopiaFile = self.detectorSim.run_polyplopia(
+                energy=energy,
+                runname=runname,
+                inputFile=inputFile,
+                backgroundfile=corsikaBgFile,  # "corsika_bg.i3.bz2",
+                MCTreeName="I3MCTree",
+                OutputMCTreeName="I3MCTree",
+                mctype="corsika",
+                TimeWindow=40,
+                log_level="INFO",
+                extraOptions="",
+            )
+            if exeFile is not None:
+                print(energy, runname, "run_polyplopia")
+                self.executeFile(key=f"{energy}_{runname}_polyplopia", exeFile=exeFile)
+            inputFile = polyplopiaFile
+
+            ####################################### clsim ########################################
+            exeFile, clsimFile = self.detectorSim.run_clsim(
+                energy=energy,
+                runname=runname,
+                inputFile=inputFile,
+                nproc=nproc,
+                procnum=procnum,
+                oversize=5,
+                efficiency=1.0,
+                icemodel="spice_3.2.1",
+            )
+            if exeFile is not None:
+                print(energy, runname, "run_clsim")
+                self.executeFile(key=f"{energy}_{runname}_clsim", exeFile=exeFile)
+            inputFile = clsimFile
         ################################# detector ##############################################
-        exeFile, DETFile = self.detectorSim.run_detector(
-            energy=energy,
-            runname=runname,
-            inputFile=inputFile,
-            nproc=nproc,
-            procnum=procnum,
-            runID=runID,
-            doFiltering=self.doFiltering,
-            extraOptions=self.extraOptions.get("Det"),
-            mcprescale=1,
-            mctype="CORSIKA",
-        )
-        if exeFile is not None:
-            print(energy, runname, "run_detector")
-            self.executeFile(key=f"{energy}_{runname}_detector", exeFile=exeFile)
+        if self.extraOptions.get("doDet"):
+            exeFile, DETFile = self.detectorSim.run_detector(
+                energy=energy,
+                runname=runname,
+                inputFile=inputFile,
+                nproc=nproc,
+                procnum=procnum,
+                runID=runID,
+                doFiltering=self.doFiltering,
+                mcprescale=1,
+                mctype="CORSIKA",
+            )
+            if exeFile is not None:
+                print(energy, runname, "run_detector")
+                self.executeFile(key=f"{energy}_{runname}_detector", exeFile=exeFile)
         ################################### LV1 ############################################
-        exeFile, LV1File = self.detectorSim.run_lv1(
-            energy=energy,
-            runname=runname,
-            DETFile=DETFile,
-            extraOptions=self.extraOptions.get("lv1"),
-        )
-        if exeFile is not None:
-            print(energy, runname, "run_lv1")
-            self.executeFile(key=f"{energy}_{runname}_lv1", exeFile=exeFile)
+        if self.extraOptions.get("doLV1"):
+            exeFile, LV1File = self.detectorSim.run_lv1(
+                energy=energy,
+                runname=runname,
+                DETFile=DETFile,
+            )
+            if exeFile is not None:
+                print(energy, runname, "run_lv1")
+                self.executeFile(key=f"{energy}_{runname}_lv1", exeFile=exeFile)
         ################################## LV2 #############################################
-        exeFile, LV2File = self.detectorSim.run_lv2(
-            energy=energy,
-            runname=runname,
-            LV1File=LV1File,
-            extraOptions=self.extraOptions.get("lv2"),
-        )
-        if exeFile is not None:
-            print(energy, runname, "run_lv2")
-            self.executeFile(key=f"{energy}_{runname}_lv2", exeFile=exeFile)
+        if self.extraOptions.get("doLV2"):
+            exeFile, LV2File = self.detectorSim.run_lv2(
+                energy=energy,
+                runname=runname,
+                LV1File=LV1File,
+                extraOptions=self.extraOptions.get("lv2"),
+            )
+            if exeFile is not None:
+                print(energy, runname, "run_lv2")
+                self.executeFile(key=f"{energy}_{runname}_lv2", exeFile=exeFile)
         #################################### LV3 ###########################################
-        exeFile, LV3File = self.detectorSim.run_lv3(
-            energy=energy,
-            runname=runname,
-            LV2File=LV2File,
-            runID=runID,
-            extraOptions=self.extraOptions.get("lv3"),
-            domeff=1.0,
-        )
-        if exeFile is not None:
-            print(energy, runname, "run_lv3")
-            self.executeFile(key=f"{energy}_{runname}_lv3", exeFile=exeFile)
+        if self.extraOptions.get("doLV3"):
+            exeFile, LV3File = self.detectorSim.run_lv3(
+                energy=energy,
+                runname=runname,
+                LV2File=LV2File,
+                runID=runID,
+                extraOptions=self.extraOptions.get("lv3"),
+                domeff=1.0,
+            )
+            if exeFile is not None:
+                print(energy, runname, "run_lv3")
+                self.executeFile(key=f"{energy}_{runname}_lv3", exeFile=exeFile)
         ###############################################################################
 
         return
@@ -403,12 +431,12 @@ def mainLoop(args):
         inDirectory=args.inDirectory,
         doFiltering=args.doFiltering,
         extraOptions={
-            "ITSG": args.ITSG_ExtraOptions,
-            "clsim": args.clsim_ExtraOptions,
-            "Det": args.DET_ExtraOptions,
-            "lv1": args.LV1_ExtraOptions,
-            "lv2": args.LV2_ExtraOptions,
-            "lv3": args.LV3_ExtraOptions,
+            "doITSG": args.doITSG,
+            "doclsim": args.doCLSIM,
+            "doDet": args.doDET,
+            "dolv1": args.doLV1,
+            "dolv2": args.doLV2,
+            "dolv3": args.doLV3,
         },
     )
 
@@ -426,7 +454,6 @@ def mainLoop(args):
 
 
 if __name__ == "__main__":
-
     parser = make_parser()
     mainLoop(args=parser.parse_args())
 

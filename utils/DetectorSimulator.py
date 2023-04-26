@@ -231,11 +231,14 @@ class DetectorSimulator:
             --gcdfile {self.GCD} \
             --seed {self.seed} \
             --nproc {nproc} \
+            --procnum {procnum} \
+            --RunID {runID} \
             --samples {self.NumbSamples} \
             --r {self.get_radius(energy)} \
+            --raise-observation-level 0 \
+            --x 0 \
+            --y 0 \
             --no-PropagateMuons \
-            --RunID {runID} \
-            --procnum {procnum} \
             --inputfilelist {inputFile} \
             --outputfile {tempFile} > {logsFile}.out 2> {logsFile}.err \
             "
@@ -251,6 +254,84 @@ class DetectorSimulator:
         )
 
         return exeFile, ITSGdataFile
+
+    def run_corsikaBg(
+        self,
+        energy,
+        runname,
+        nproc,
+        procnum,
+        CORSIKA_samples=100,
+    ):
+        """
+        Some documentation
+        """
+        outputFolder = f"{self.outDirectory}/generated/corsika"
+        outputFolder += f"/Corsika_{self.detector}_corsika_icetop.{self.MCdataset}/"
+
+        CorsikaFile = (
+            f"{outputFolder}/data/{energy}/{runname}.i3.bz2"  # Path and File name
+        )
+        tempFile = (
+            f"{outputFolder}/temp/{energy}/{runname}.i3.bz2"  # Path and File name
+        )
+        logsFile = (
+            f"{outputFolder}/logs/{energy}/{runname}"  # ERR and OUT file destination
+        )
+        exeFile = f"{outputFolder}/inps/{energy}/{runname}.sh"  # Path where the input file needs to be written
+
+        # Checks if the file already exist, in case so it returns None
+        if os.path.isfile(CorsikaFile):
+            return None, CorsikaFile
+
+        # this function makes the data, temp, logs, inps directory
+        self.make_folders(outputFolder, energy)
+        # make the folder
+
+        # create the corsika file name
+
+        # The python script that needs to be executed with its arguments
+        cmdPython = f"{self.pythonPath} {self.i3build}/simprod-scripts/resources/scripts/corsika.py "
+        cmdOptions = f"\
+            --corsikaName dcorsika \
+            --CORSIKAseed {self.seed * nproc + procnum} \
+            --corsikaVersion v6960-5comp \
+            --eprimarymin 600 \
+            --eprimarymax 1e11 \
+            --gcdfile {self.GCD} \
+            --nproc {nproc} \
+            --nshowers {CORSIKA_samples * 500} \
+            --OverSampling 1 \
+            --procnum {procnum} \
+            --ranpri 2 \
+            --arrang -120.7 \
+            --obslev 284000 \
+            --donkg 1 \
+            --doegs 1 \
+            --bx 16.75 \
+            --bz -51.96 \
+            --skipoptions 'compress' \
+            --seed {self.seed * nproc + procnum} \
+            --LegacyOverSampling \
+            --UseGSLRNG \
+            --outputfile {tempFile} > {logsFile}.out 2> {logsFile}.err \
+            "
+        #  --outputfile {tempFile} \
+        # --summaryfile bgsummary.xml \
+        # --no-RunCorsika \
+        # 500
+        # moves the file to its final location once everything is done
+        cmdMoveFile = f"mv {tempFile} {CorsikaFile}"
+
+        # writes the sh file and makes it executable
+        self.writeSHexeFile(
+            exeFile,
+            cmdPython,
+            cmdOptions,
+            cmdMoveFile,
+        )
+
+        return exeFile, CorsikaFile
 
     def run_polyplopia(
         self,
@@ -270,7 +351,7 @@ class DetectorSimulator:
         --------------------------------------------------------
         Parameters:
             energy: the energy in log10 E/GeV
-            inputFile: the name of the input file in this case it is the Corsika output file
+            inputFile: the name of the input file in this case it is the IceTopShowerGenerator output file
 
             backgroundfile: the name of the background file default is corsika_bg.i3.bz2
             MCTreeName: the name of the MCTree in the i3 file default is I3MCTree
@@ -283,8 +364,8 @@ class DetectorSimulator:
             exeFile: the file that need to be executed
         """
         self.checkIfInputExists(inputFile)
-        outputFolder = f"{self.outDirectory}/generated/topsimulator"
-        outputFolder += f"/Polyplotpia_{self.detector}_corsika_icetop.{self.MCdataset}/"
+        outputFolder = f"{self.outDirectory}/generated/polyplopia"
+        outputFolder += f"/Polyplopia_{self.detector}_corsika_icetop.{self.MCdataset}/"
 
         polyplopiaDataFile = (
             f"{outputFolder}/data/{energy}/{runname}.i3.bz2"  # Path to File name
@@ -336,7 +417,7 @@ class DetectorSimulator:
         extraOptions="",
         oversize=5,
         efficiency=1.0,
-        icemodel="spice_3.2.1",
+        icemodel="spice_ftp-v1",  # "spice_3.2.1",
     ):
         """
         Runs the clsim.py scripts with the default options
@@ -358,8 +439,11 @@ class DetectorSimulator:
         self.checkIfInputExists(inputFile)
 
         icemodellocation = f"{self.i3build}/ice-models/resources/models/ICEMODEL"
+        # holeiceparametrization = (
+        #     f"{self.i3build}/ice-models/resources/models/ANGSENS/angsens_flasher/as.9"
+        # )
         holeiceparametrization = (
-            f"{self.i3build}/ice-models/resources/models/ANGSENS/angsens_flasher/as.9"
+            f"{self.i3build}/ice-models/resources/models/ICEMODEL/spice_ftp-v1/as.dat"
         )
 
         outputFolder = f"{self.outDirectory}/generated/clsim"
@@ -398,6 +482,11 @@ class DetectorSimulator:
             --inputfilelist {inputFile} \
             --outputfile {tempFile} > {logsFile}.out 2> {logsFile}.err \
             "
+        # --runmphitfilter \
+        # --PropagateMuons \
+        # --no-RunMPHitFilter \
+        # --keep-pure-background \
+        # TODO             --summaryfile \
 
         if extraOptions:
             cmdOptions += extraOptions
@@ -406,7 +495,7 @@ class DetectorSimulator:
 
         self.writeSHexeFile(exeFile, cmdPython, cmdOptions, cmdMoveFile)
 
-        return exeFile, inputFile
+        return exeFile, CLSdataFile
 
     def run_detector(
         self,
@@ -469,11 +558,11 @@ class DetectorSimulator:
         cmdOptions = f"\
             --UseGSLRNG \
             --gcdfile {self.GCD} \
+            --LowMem \
             --IceTop \
             --UseLinearTree \
             --MCPrescale {mcprescale} \
             --MCType {mctype} \
-            --LowMem \
             --seed {self.seed} \
             --nproc {nproc} \
             --DetectorName {self.detector} \
@@ -503,6 +592,7 @@ class DetectorSimulator:
         energy,
         runname,
         DETFile,
+        MiniBiasPrescale=100,
         extraOptions="",
     ):
         """
@@ -546,6 +636,7 @@ class DetectorSimulator:
         cmdOptions = f"\
             --needs_wavedeform_spe_corr \
             --photonicsdir {self.photonDir} \
+            --MinBiasPrescale {MiniBiasPrescale} \
             -g {self.GCD} \
             -i {DETFile} \
             -o {tempFile} > {logsFile}.out 2> {logsFile}.err \
@@ -615,6 +706,7 @@ class DetectorSimulator:
             -i {LV1File} \
             -o {tempFile} > {logsFile}.out 2> {logsFile}.err \
             "
+        # --simulation \???
 
         if self.NumbFrames:
             cmdOptions += f"-n {self.NumbFrames} "
@@ -626,7 +718,7 @@ class DetectorSimulator:
 
         self.writeSHexeFile(exeFile, cmdPython, cmdOptions, cmdMoveFile)
 
-        # Execute LV1 via submitter
+        # Execute LV2 via submitter
         return exeFile, LV2dataFile
 
     def run_lv3(

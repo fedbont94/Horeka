@@ -35,12 +35,12 @@ class FileWriter:
         # and values the arbitrary numbering used in this script for all primary particle.
         azimuth={
             "start": 0.00000000,  # Lower limit of azimuth (do not change unless you know what you are doing)
-            "end": 359.99000000,
-        },  # Upper limit of azimuth (do not change unless you know what you are doing)
+            "end": 359.99000000,  # Upper limit of azimuth (do not change unless you know what you are doing)
+        },
         zenith={
             "start": 0.00000000,  # Lower limit of zenith (do not change unless you know what you are doing)
-            "end": 65.0000000,
-        },  # Upper limit of zenith (do not change unless you know what you are doing)
+            "end": 65.0000000,  # Upper limit of zenith (do not change unless you know what you are doing)
+        },
     ):
         self.dataset = dataset
         self.username = username
@@ -92,9 +92,10 @@ class FileWriter:
 
         # Opening and writing in the file
         with open(inp_name, "w") as file:
-            ######Things that go into the input files for corsika#######
+            ####### Things that go into the input files for corsika #######
             file.write(
-                f"RUNNR   {runNumber}\n"  # Unique run number in the file name of corsika
+                ""
+                + f"RUNNR   {runNumber}\n"  # Unique run number in the file name of corsika
                 + f"EVTNR   1\n"
                 + f"SEED    {seed1}    0    0\n"  #
                 + f"SEED    {seed2}    0    0\n"  #
@@ -123,7 +124,7 @@ class FileWriter:
                 + f"LONGI   T   10.     T       T\n"
                 + f"RADNKG  2.E5\n"
                 + f"ATMOD   33\n"  # real atmosphere (April avg. is used here)
-                + f"DIRECT  {self.directories['temp']}/{log10_E1}/{runNumber}\n"
+                + f"DIRECT  {self.directories['temp']}/{log10_E1}/\n"
                 + f"USER    {self.username}\n"
                 + f"EXIT\n"
             )
