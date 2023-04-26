@@ -31,7 +31,7 @@ MakeDetectorResponse.py - Is the main script that for detector response simulati
 
 utils/FileWriter.py -       Contains a class that can be used to create and write a Corsika inp file and create "data", "temp", "log", "inp" folders. \
                             (more documentation in the script)
-utils/SimulationMaker.py -  Contains a class that can be used for generating the submission stings and sh executable files. \
+utils/CorsikaSimulator.py -  Contains a class that can be used for generating the submission stings and sh executable files. \
                             It also has the generator function which yields the keys and string to submit, 
                             made via the combinations of file and energies \
                             (more documentation in the script)

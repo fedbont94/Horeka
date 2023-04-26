@@ -6,7 +6,7 @@ It uses the 3 classes imported from utils
 FileWriter class can be used to create and write a Corsika inp file 
     and create "data", "temp", "log", "inp" folders.
     
-SimulationMaker class can be used for generating the submission stings and sh executable files. 
+CorsikaSimulator class can be used for generating the submission stings and sh executable files. 
     It also has the generator function which yields the keys and string to submit, 
     made via the combinations of file and energies 
 
@@ -25,10 +25,11 @@ How to run:
 """
 import sys
 import os
+import argparse
 import numpy as np
 
 from utils.FileWriter import FileWriter
-from utils.SimulationMaker import SimulationMaker
+from utils.CorsikaSimulator import CorsikaSimulator
 from utils.Submitter import Submitter
 
 
@@ -75,85 +76,7 @@ def __checkInputs(args):
     return
 
 
-def mainCorsikaSim(args):
-    """
-    Some Documentation of the main function for the Corsika Simulator
-
-    Defines the indexing of the primaries. This can be updated if needed in the future.
-    Checks if the inputs given are consistent with the script
-    Defines the energy range
-    Calls a bunch of classes
-    Finally:
-    start spawning and checking multiple simulations.
-    """
-    # This is a dictionary, with keys the Corsika numbering of primary,
-    # and values the arbitrary numbering used in this script for all primary particle.
-    # In principle this can be expanded with all primaries that one wants
-    args.primIdDict = {
-        1: 0,  # Gammas (photons)
-        14: 1,  # Protons (H)
-        402: 2,  # Helium (He)
-        1608: 3,  # Oxygen (O)
-        5626: 4,  # Iron (Fe)
-        2814: 5,  # Silicon (Si)
-    }
-
-    # Checks if the input given are consistent with the structure of the script
-    __checkInputs(args)
-
-    # Defines the energy range given the start, end and step
-    energies = np.around(  # Need to round the numpy array otherwise the floating is wrong
-        np.arange(
-            args.energyStart,  # energy starting point
-            args.energyEnd
-            + args.energyStep,  # energy end point plus one step in order to include last step
-            args.energyStep,  # step in energies
-        ),
-        decimals=1,  # the rounding has to have one single decimal point for the folder.
-    )
-
-    fW = FileWriter(
-        username=args.username,  # User name on server
-        dirSimulations=args.dirSimulations,
-        primary=args.primary,  # 1 is gamma, 14 is proton, 402 is He, 1608 is Oxygen, 5626 is Fe
-        dataset=args.dataset,  # changed on 28 Jan 2020 according to IC std: 13000.0 +000 H, +100 He, +200 O, +300 Fe, +400 Gamma
-        primIdDict=args.primIdDict,
-        azimuth={
-            "start": args.azimuthStart,  # Lower limit of zenith (do not change unless you know what you are doing)
-            "end": args.azimuthEnd,
-        },  # Upper limit of zenith (do not change unless you know what you are doing)
-        zenith={
-            "start": args.zenithStart,  # Lower limit of azimuth (do not change unless you know what you are doing)
-            "end": args.zenithEnd,
-        },  # Upper limit of azimuth (do not change unless you know what you are doing)
-    )
-
-    simMaker = SimulationMaker(
-        startNumber=args.startNumber,
-        endNumber=args.endNumber,
-        energies=energies,
-        fW=fW,  # The fileWriter class
-        pathCorsika=args.pathCorsika,
-        corsikaExe=args.corsikaExe,
-    )
-
-    submitter = Submitter(
-        MakeKeySubString=simMaker.generator,
-        logDir=args.logDirProcesses,
-        parallel_sim=args.parallelSim,
-    )
-
-    # Starts the spawn of the simulations
-    submitter.startProcesses()
-    # Loops over the running processes and checks if any process is complete.
-    # If so, it will spawn the next one
-    submitter.checkRunningProcesses()
-
-
-if __name__ == "__main__":
-
-    import argparse
-
+def get_args():
     parser = argparse.ArgumentParser(
         description="Inputs for the Corsika Simulation Maker"
     )
@@ -255,6 +178,87 @@ if __name__ == "__main__":
         help="Number of parallel simulation processes",
     )
 
-    mainCorsikaSim(args=parser.parse_args())
+    return parser.parse_args()
+
+
+def mainCorsikaSim(args):
+    """
+    Some Documentation of the main function for the Corsika Simulator
+
+    Defines the indexing of the primaries. This can be updated if needed in the future.
+    Checks if the inputs given are consistent with the script
+    Defines the energy range
+    Calls a bunch of classes
+    Finally:
+    start spawning and checking multiple simulations.
+    """
+    # This is a dictionary, with keys the Corsika numbering of primary,
+    # and values the arbitrary numbering used in this script for all primary particle.
+    # In principle this can be expanded with all primaries that one wants
+    args.primIdDict = {
+        1: 0,  # Gammas (photons)
+        14: 1,  # Protons (H)
+        402: 2,  # Helium (He)
+        1608: 3,  # Oxygen (O)
+        5626: 4,  # Iron (Fe)
+        2814: 5,  # Silicon (Si)
+    }
+
+    # Checks if the input given are consistent with the structure of the script
+    __checkInputs(args)
+
+    # Defines the energy range given the start, end and step
+    energies = np.around(  # Need to round the numpy array otherwise the floating is wrong
+        np.arange(
+            args.energyStart,  # energy starting point
+            args.energyEnd
+            + args.energyStep,  # energy end point plus one step in order to include last step
+            args.energyStep,  # step in energies
+        ),
+        decimals=1,  # the rounding has to have one single decimal point for the folder.
+    )
+
+    fW = FileWriter(
+        username=args.username,  # User name on server
+        dirSimulations=args.dirSimulations,
+        primary=args.primary,  # 1 is gamma, 14 is proton, 402 is He, 1608 is Oxygen, 5626 is Fe
+        dataset=args.dataset,  # changed on 28 Jan 2020 according to IC std: 13000.0 +000 H, +100 He, +200 O, +300 Fe, +400 Gamma
+        primIdDict=args.primIdDict,
+        azimuth={
+            "start": args.azimuthStart,  # Lower limit of zenith (do not change unless you know what you are doing)
+            "end": args.azimuthEnd,
+        },  # Upper limit of zenith (do not change unless you know what you are doing)
+        zenith={
+            "start": args.zenithStart,  # Lower limit of azimuth (do not change unless you know what you are doing)
+            "end": args.zenithEnd,
+        },  # Upper limit of azimuth (do not change unless you know what you are doing)
+    )
+
+    corsikaSim = CorsikaSimulator(
+        startNumber=args.startNumber,
+        endNumber=args.endNumber,
+        energies=energies,
+        fW=fW,  # The fileWriter class
+        pathCorsika=args.pathCorsika,
+        corsikaExe=args.corsikaExe,
+    )
+
+    submitter = Submitter(
+        MakeKeySubString=corsikaSim.generator,
+        logDir=args.logDirProcesses,
+        parallel_sim=args.parallelSim,
+    )
+
+    # Starts the spawn of the simulations
+    submitter.startProcesses()
+    # Loops over the running processes and checks if any process is complete.
+    # If so, it will spawn the next one
+    submitter.checkRunningProcesses()
+
+
+if __name__ == "__main__":
+    args = get_args()
+
+    mainCorsikaSim(args=args)
 
     print("-------------------- Program finished --------------------")

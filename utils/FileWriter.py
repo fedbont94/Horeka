@@ -123,7 +123,7 @@ class FileWriter:
                 + f"LONGI   T   10.     T       T\n"
                 + f"RADNKG  2.E5\n"
                 + f"ATMOD   33\n"  # real atmosphere (April avg. is used here)
-                + f"DIRECT  {self.directories['temp']}/{log10_E1}/{runNumber}\n"
+                + f"DIRECT  {self.directories['temp']}/{log10_E1}/\n"
                 + f"USER    {self.username}\n"
                 + f"EXIT\n"
             )
