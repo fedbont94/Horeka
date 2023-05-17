@@ -1,13 +1,14 @@
 #!/bin/bash
-#SBATCH --job-name=GRANDmagic
-#SBATCH --output=/home/hk-project-radiohfi/bg5912/work/sims/GRAND/proton_test_gp13+stshp/logs/_log%a.out
-#SBATCH --error=/home/hk-project-radiohfi/bg5912/work/sims/GRAND/proton_test_gp13+stshp/logs/_log%a.err
-#SBATCH --nodes=1
-#SBATCH --time=06:00:00
+#SBATCH --job-name=mpi
+#SBATCH --output=/home/kit/ikp/bg5912/work/sims/GRAND/mpitest/logs/_log%a.out
+#SBATCH --error=/home/kit/ikp/bg5912/work/sims/GRAND/mpitest/logs/_log%a.err
+#SBATCH --nodes=2
+#SBATCH --cpus-per-task=12
+#SBATCH --time=72:00:00
 #SBATCH --tasks=2
-#SBATCH --mem=50gb
-#SBATCH --export=NONE
+######SBATCH --mem=50gb
+######SBATCH --export=NONE
 #######################SBATCH --gres=gpu:4
 
-/home/hk-project-radiohfi/bg5912/Horeka/corsikaSim.sh
+/home/kit/ikp/bg5912/Horeka_Jelena/corsikaSim.sh
 # home/hk-project-radiohfi/bg5912/simulations_scripts/corsikaSim.sh

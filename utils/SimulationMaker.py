@@ -54,7 +54,8 @@ class SimulationMaker:
                 # The runNumber is calculated as follows:
                 # EEiiii where EE is the energy in log10/GeV *10 
                 # and iiii is the run index number. 
-                runNumber = int(log10_E1 * 10_000 + runIndex)
+                runNumber = int(log10_E1 * 10_000 * 10 + runIndex) 
+                #remove the *10 for energies above 10 - otherwise the filenames are messed up
                 
                 # Check if this simulation is not in data. Thus, was already created
                 # There is thus no need to redo it
@@ -93,11 +94,14 @@ class SimulationMaker:
                 + f"\nrm {self.fW.directories['inp']}/{log10_E}/SIM{runNumber}_coreas.bins"
                 # TODO check if you use mpi or not - the commands for executing corsika are different
                 # + f"\n{self.pathCorsika}/{self.corsikaExe} < {inpFile} > {logFile}" # This is how you execute a corsika file
-                + f"\n mpirun -n 72 --bind-to core:overload-allowed --map-by core -report-bindings {self.pathCorsika}/{self.corsikaExe} {inpFile} > {logFile}" # This is how you execute an mpi corsika file
+                + f"module load compiler/gnu/10.2"
+                + f"module load mpi/openmpi/4.1"
+                + f"\nmpirun --bind-to core:overload-allowed --map-by core -report-bindings {self.pathCorsika}/{self.corsikaExe} {inpFile} > {logFile}" # This is how you execute an mpi corsika file
                 + f"\n{mvDATfiles}" # Move the DAT files from inp directory to the data directory
                 # + f"\nrm {tempFile}" # It removes this temporary file since it is not needed anymore
                 + f"\n "
             )
+
 
         # Make the file executable
         st = os.stat(tempFile)

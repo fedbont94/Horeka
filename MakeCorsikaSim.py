@@ -166,13 +166,13 @@ if __name__ == "__main__":
     parser.add_argument(
         "--dirSimulations",
         type=str,
-        default="/home/hk-project-radiohfi/bg5912/work/sims/GRAND_sims_test/sim_storage/",
+        default="/home/kit/ikp/bg5912/work/sims/GRAND/mpitest/sim_storage/",
         help="Directory where the simulation are stored",
     )
     parser.add_argument(
         "--pathCorsika",
         type=str,
-        default="/home/hk-project-radiohfi/bg5912/work/soft/corsika-77420/run/",
+        default="/home/kit/ikp/bg5912/work/soft/corsika-77420/run/",
         help="the /run directory where the executable of corsika is located",
     )
     parser.add_argument(
@@ -248,21 +248,21 @@ if __name__ == "__main__":
     parser.add_argument(
         "--pathAntennas",
         type=str,
-        default="/home/hk-project-radiohfi/bg5912/Horeka/utils/gp13.list",
+        default="/home/kit/ikp/bg5912/Horeka_Jelena/utils/gp13.list",
         help="the directory where the antenna position file is located"
     )
 
     parser.add_argument(
         "--pathStarshapes",
         type=str,
-        default="/home/hk-project-radiohfi/bg5912/Horeka/utils/starshapes.list",
+        default="/home/kit/ikp/bg5912/Horeka_Jelena/utils/starshapes.list",
         help="the directory where the starshape position file is located"
     )
 
     parser.add_argument(
         "--logDirProcesses",
         type=str,
-        default="/home/hk-project-radiohfi/bg5912/work/sims/GRAND_sims_test/logs/",
+        default="/home/kit/ikp/bg5912/work/sims/GRAND/mpitest/logs/",
         help="Directory where log files of the multiple subProcesses are stored",
     )
     parser.add_argument(
