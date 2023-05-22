@@ -771,13 +771,13 @@ class DetectorSimulator:
 
         self.make_folders(outputFolder, energy)
 
-        cmdPython = f"{self.pythonPath} {self.i3build}/icetop_Level3_scripts/resources/scripts/level3_iceprod.py "
+        # cmdPython = f"{self.pythonPath} {self.i3build}/icetop_Level3_scripts/resources/scripts/level3_iceprod.py "
+        cmdPython = f"{self.pythonPath} {self.i3build}/icetop_Level3_scripts/resources/scripts/level3_IceTop_InIce.py "
         cmdOptions = f"\
             -d {self.detector} \
             --isMC \
             --waveforms \
             --spe-corr \
-            --do-inice \
             --print-usage \
             --dataset {self.dataset} \
             --run {runID} \
@@ -788,6 +788,7 @@ class DetectorSimulator:
         # --L2-gcdfile {self.GCD} \
         # --L3-gcdfile {self.Lv3GCD} \
         # --photonicsdir {self.photonDir} \
+        # --do-inice \
 
         if self.NumbFrames:
             cmdOptions += f"-n {self.NumbFrames} "

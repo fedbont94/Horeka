@@ -1,12 +1,19 @@
 #!/bin/bash
 #SBATCH --job-name=PhotonDetectorResponse
-#SBATCH --output=/home/hk-project-pevradio/rn8463/logDetResponse/_log%a.out
-#SBATCH --error=/home/hk-project-pevradio/rn8463/logDetResponse/_log%a.err
+#SBATCH --output=/home/hk-project-pevradio/rn8463/log/logDetResponse5460lv2/_log%a.out
+#SBATCH --error=/home/hk-project-pevradio/rn8463/log/logDetResponse5460lv2/_log%a.err
 #SBATCH --nodes=1
-#SBATCH --time=0-01:00:00
+#SBATCH --time=1-00:00:00
 #SBATCH --tasks=2
-#SBATCH --mem=10gb
+#SBATCH --mem=100gb
 #SBATCH --export=NONE
-#######################SBATCH --gres=gpu:4
+#SBATCH --gres=gpu:4
+#SBATCH --container-image $HOME/osgvo-el7-cuda10.sif
+#SBATCH --container-mounts=/home/hk-project-pevradio/rn8463/cvmfsexec/dist/cvmfs:/cvmfs,/scratch,/etc/OpenCL,/hkfs/work/workspace/scratch/rn8463-gamma_simulations
 
-/home/hk-project-pevradio/rn8463/simulations_scripts/corsikaSim.sh
+
+$HOME/cvmfsexec/umountrepo icecube.opensciencegrid.org
+$HOME/cvmfsexec/mountrepo icecube.opensciencegrid.org
+export SINGULARITY_BIND="/home/hk-project-pevradio/rn8463/cvmfsexec/dist/cvmfs:/cvmfs,/scratch,/etc/OpenCL,/hkfs/work/workspace/scratch/rn8463-gamma_simulations" # TODO This can be commented out?
+export APPTAINER_BIND="/home/hk-project-pevradio/rn8463/cvmfsexec/dist/cvmfs:/cvmfs,/scratch,/etc/OpenCL,/hkfs/work/workspace/scratch/rn8463-gamma_simulations"
+singularity exec --nv $HOME/osgvo-el7-cuda10.sif /home/hk-project-pevradio/rn8463/simulations_scripts/detectorResponse.sh

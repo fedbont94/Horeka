@@ -160,6 +160,11 @@ def make_parser():
         help="do you want to run ITShowerGenerator.py? deafualt: False",
     )
     parser.add_argument(
+        "--doInIceBg",
+        action="store_true",
+        help="do you want to run In-Ice background with Corsika and polyplopia? deafualt: False",
+    )
+    parser.add_argument(
         "--doCLSIM",
         action="store_true",
         help="do you want to run clsim.py? deafualt: False",
@@ -184,7 +189,7 @@ def make_parser():
         action="store_true",
         help="do you want to run level3_iceprod.py? (level 3 simulation) deafualt: False",
     )
-    return parser
+    return parser.parse_args()
 
 
 def generatorFake():
@@ -197,6 +202,14 @@ def generatorFake():
 class ProcessRunner:
     """
     This class is used to run the simulations and call the shell scripts.
+    -----------------------------------------------------------------------
+    Parameters:
+        detectorSim: the detector simulation class
+        submitter: the submitter class
+        energies: the energy range that will be simulated
+        inDirectory: the directory where the data corsika files are located
+        doFiltering: if True, the data will be filtered with the lv3 trigger filtering
+        extraOptions: a dictionary with the extra options that will be passed to the submitter class # TODO: check if this is needed
     """
 
     def __init__(
@@ -264,7 +277,7 @@ class ProcessRunner:
                 print(energy, runname, "run_ITShowerGenerator")
                 self.executeFile(key=f"{energy}_{runname}_ITSG", exeFile=exeFile)
             inputFile = ITSGFile
-        if self.extraOptions.get("doCLSIM"):
+        if self.extraOptions.get("doInIceBg"):
             ####################################### corsika #################################################
             exeFile, corsikaBgFile = self.detectorSim.run_corsikaBg(
                 energy=energy,
@@ -295,6 +308,7 @@ class ProcessRunner:
                 self.executeFile(key=f"{energy}_{runname}_polyplopia", exeFile=exeFile)
             inputFile = polyplopiaFile
 
+        if self.extraOptions.get("doCLSIM"):
             ####################################### clsim ########################################
             exeFile, clsimFile = self.detectorSim.run_clsim(
                 energy=energy,
@@ -311,7 +325,7 @@ class ProcessRunner:
                 self.executeFile(key=f"{energy}_{runname}_clsim", exeFile=exeFile)
             inputFile = clsimFile
         ################################# detector ##############################################
-        if self.extraOptions.get("doDet"):
+        if self.extraOptions.get("doDET"):
             exeFile, DETFile = self.detectorSim.run_detector(
                 energy=energy,
                 runname=runname,
@@ -432,11 +446,12 @@ def mainLoop(args):
         doFiltering=args.doFiltering,
         extraOptions={
             "doITSG": args.doITSG,
-            "doclsim": args.doCLSIM,
-            "doDet": args.doDET,
-            "dolv1": args.doLV1,
-            "dolv2": args.doLV2,
-            "dolv3": args.doLV3,
+            "doInIceBg": args.doInIceBg,
+            "doCLSIM": args.doCLSIM,
+            "doDET": args.doDET,
+            "doLV1": args.doLV1,
+            "doLV2": args.doLV2,
+            "doLV3": args.doLV3,
         },
     )
 
@@ -454,7 +469,6 @@ def mainLoop(args):
 
 
 if __name__ == "__main__":
-    parser = make_parser()
-    mainLoop(args=parser.parse_args())
+    mainLoop(args=make_parser())
 
     print("------------------- Program finished --------------------")
