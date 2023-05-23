@@ -94,7 +94,8 @@ class FileWriter:
         with open(inp_name, "w") as file:
             ######Things that go into the input files for corsika#######
             file.write(
-                f"RUNNR   {runNumber}\n"  # Unique run number in the file name of corsika
+                ""
+                + f"RUNNR   {runNumber}\n"  # Unique run number in the file name of corsika
                 + f"EVTNR   1\n"
                 + f"SEED    {seed1}    0    0\n"  #
                 + f"SEED    {seed2}    0    0\n"  #
@@ -105,22 +106,23 @@ class FileWriter:
                 + f"PRMPAR  {self.primary}\n"
                 + f"THETAP  {self.zenith['start']}    {self.zenith['end']}\n"  #
                 + f"PHIP    {self.azimuth['start']} {self.azimuth['end']}\n"  #
-                + f"ECUTS   0.0500 0.0500 0.0100 0.0020\n"
-                + f"ELMFLG  F    T\n"  # Disable NKG since it gets deactivated anyway when CURVED is selected at corsika setup
+                + f"ECUTS   0.02     0.01    4.0E-04 4.00E-04\n"
+                + f"ELMFLG  T    T\n"  # Disable NKG since it gets deactivated anyway when CURVED is selected at corsika setup
                 + f"OBSLEV  2840.E2\n"  # changed from 2837 m to 2840 m on 26 Nov 2019
-                + f"ECTMAP  100\n"
+                + f"ECTMAP  100\n"  # It DOES NOT effect sim. example 100 you have all particles with energy > 100 GeV printed in the output file. Also used 1.e11
                 + f"SIBYLL  T    0\n"  # Keep this only if we are running sibyll
                 + f"SIBSIG  T\n"  # Keep this only if we are running sibyll
-                + f"SIBCHM  T\n"  # Enable charm production with Sibyll
-                + f"ARRANG  -120.7\n"  # Rotates the output from corika to IC coordinates # changed Nov 26 2019
+                # + f"SIBCHM  T\n"  # Enable charm production with Sibyll
+                # + f"ARRANG  -120.7\n"  # Rotates the output from corika to IC coordinates # changed Nov 26 2019
+                + f"FIXHEI  0.    0\n"
                 + f"HADFLG  0    1    0    1    0    2\n"
                 + f"STEPFC  1.0\n"
-                + f"DEBUG   F    6    F    1000000\n"
+                # + f"DEBUG   F    6    F    1000000\n"
                 + f"MUMULT  T\n"
                 + f"MUADDI  T\n"
-                + f"MAXPRT  0\n"
+                + f"MAXPRT  1\n"
                 + f"MAGNET  16.75       -51.96\n"  # changed on Nov 26 2019
-                + f"LONGI   T   10.     T       T\n"
+                + f"LONGI   T   20.     T       T\n"
                 + f"RADNKG  2.E5\n"
                 + f"ATMOD   33\n"  # real atmosphere (April avg. is used here)
                 + f"DIRECT  {self.directories['temp']}/{log10_E1}/\n"
