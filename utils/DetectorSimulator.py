@@ -21,7 +21,6 @@ class DetectorSimulator:
         MCdataset,
         seed,
         year,
-        doLv3,
         NumbSamples=100,
         NumbFrames=0,
         i3build="",
@@ -37,7 +36,6 @@ class DetectorSimulator:
             MCdataset: the name of the MC dataset (ask the coordinators)
             seed: the seed for the random number generator (ask the coordinators)
             year: the year of the simulation
-            doLv3: if True, it will do the Level3 simulation
             NumbSamples: the number of samples to be simulated (default 100)
             NumbFrames: the number of frames to be simulated (default 0)
             i3build: the path to the icetray build directory (github.com/icecube/icetray)
@@ -60,8 +58,6 @@ class DetectorSimulator:
         self.GCD = GCD
         self.photonDir = photonDirectory
         self.Lv3GCD = ""
-        if doLv3:
-            self.Lv3GCD = self.GCD
 
     ########################### Useful functions ############################
 
@@ -92,7 +88,12 @@ class DetectorSimulator:
             import warnings
 
             warnings.warn(
-                f"\nThe program is not stopped, but be aware that: \n{inputFile} \nDOES NOT EXIST!!"
+                f"\
+                    \nThe program is not stopped, but be aware that: \
+                    \n{inputFile} \
+                    \n!!!!! DOES NOT EXIST !!!!!\
+                    \n",
+                stacklevel=2,  # This is to show the line where the warning is raised and not repeated twice
             )
         return
 
@@ -148,6 +149,7 @@ class DetectorSimulator:
         According to the IC standard simulations,
         the radius depends on the energy as follows:
 
+        rgen[logE>4.0] = 400
         rgen[logE>5.0] = 800
         rgen[logE>6.0] = 1100
         rgen[logE>7.0] = 1700
@@ -162,6 +164,7 @@ class DetectorSimulator:
         """
         logE = int(logE)
         radius = {
+            4: 400,
             5: 800,
             6: 1100,
             7: 1700,

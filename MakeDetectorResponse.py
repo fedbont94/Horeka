@@ -99,11 +99,6 @@ def make_parser():
         help="The seed is the base seed which is 100_000 times the given dataset number",
     )
     parser.add_argument(
-        "-doLv3",
-        action="store_true",  # default False
-        help="Analysis level, i.e. include level 3 in the production",
-    )
-    parser.add_argument(
         "-doFiltering",
         action="store_true",  # default False
         help="Cut data with the trigger filtering. Useful for Level 0, 1 and 2",
@@ -420,7 +415,6 @@ def mainLoop(args):
         MCdataset=args.MCdataset,
         seed=args.seed,
         year=args.year,
-        doLv3=args.doLv3,
         NumbSamples=args.NumbSamples,
         NumbFrames=args.NumbFrames,
         i3build=args.i3build,
