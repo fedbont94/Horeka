@@ -1,7 +1,7 @@
 #!/bin/bash
 #SBATCH --job-name=PhotonDetectorResponse
-#SBATCH --output=/home/hk-project-pevradio/rn8463/log/logDetResponse4069/_log%a.out
-#SBATCH --error=/home/hk-project-pevradio/rn8463/log/logDetResponse4069/_log%a.err
+#SBATCH --output=/home/hk-project-pevradio/rn8463/log/logDetResponse4069_p2/_log%a.out
+#SBATCH --error=/home/hk-project-pevradio/rn8463/log/logDetResponse4069_p2/_log%a.err
 #SBATCH --nodes=1
 #SBATCH --time=1-00:00:00
 #SBATCH --mem=200gb

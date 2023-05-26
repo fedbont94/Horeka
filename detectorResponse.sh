@@ -33,8 +33,8 @@ energyStart=4.0
 energyEnd=6.9
 
 # Parallelization
-parallelSim=200
-logDirProcesses="/home/hk-project-pevradio/rn8463/log/logDetResponse4069/"
+parallelSim=400
+logDirProcesses="/home/hk-project-pevradio/rn8463/log/logDetResponse4069_p2/"
 #################################### TODO ####################################
 
 ############### Generated #####################
