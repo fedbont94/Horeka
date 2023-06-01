@@ -23,42 +23,42 @@ MCdataset=14000
 dataset=12012
 seed=1201200000
 energyStep=0.1
-photonDirectory="/hkfs/work/workspace/scratch/rn8463-gamma_simulations/photon_tables/"
+photonDirectory="/cvmfs/icecube.opensciencegrid.org/data/photon-tables/"
 NumbSamples=100
 NumbFrames=0
 
 #################################### TODO ####################################
 # Energy range for the detector response
 energyStart=4.0
-energyEnd=6.9
+energyEnd=6.0
 
 # Parallelization
-parallelSim=400
-logDirProcesses="/home/hk-project-pevradio/rn8463/log/logDetResponse4069_p2/"
+parallelSim=100
+logDirProcesses="/home/hk-project-pevradio/rn8463/log/logDetResponse4069lv2_p2/"
 #################################### TODO ####################################
 
 ############### Generated #####################
-$environment1 $PYTHON $SCRIPT \
-                -inDirectory $inDirectory \
-                -outDirectory $outDirectory \
-                -pythonPath $PYTHON \
-                -detector $detector \
-                -GCD $GCD \
-                -year $year \
-                -MCdataset $MCdataset \
-                -dataset $dataset \
-                -seed $seed \
-                -energyStart $energyStart \
-                -energyEnd $energyEnd \
-                -energyStep $energyStep \
-                -logDirProcesses $logDirProcesses \
-                -parallelSim $parallelSim \
-                --photonDirectory $photonDirectory \
-                --NumbSamples $NumbSamples \
-                --NumbFrames $NumbFrames \
-                -doFiltering \
-                --doITSG \
-                --doDET 
+# $environment1 $PYTHON $SCRIPT \
+#                 -inDirectory $inDirectory \
+#                 -outDirectory $outDirectory \
+#                 -pythonPath $PYTHON \
+#                 -detector $detector \
+#                 -GCD $GCD \
+#                 -year $year \
+#                 -MCdataset $MCdataset \
+#                 -dataset $dataset \
+#                 -seed $seed \
+#                 -energyStart $energyStart \
+#                 -energyEnd $energyEnd \
+#                 -energyStep $energyStep \
+#                 -logDirProcesses $logDirProcesses \
+#                 -parallelSim $parallelSim \
+#                 --photonDirectory $photonDirectory \
+#                 --NumbSamples $NumbSamples \
+#                 --NumbFrames $NumbFrames \
+#                 -doFiltering \
+#                 --doITSG \
+#                 --doDET 
 
                 # --doInIceBg \
                 # --doCLSIM \

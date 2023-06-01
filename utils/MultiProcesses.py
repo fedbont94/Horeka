@@ -52,7 +52,7 @@ class MultiProcesses:
             self.processDict[key] = mp.Process(
                 target=self.functionToRun, args=[*keyArgs]
             )
-            print("\n==================== New Process ====================")
+            # print("\n==================== New Process ====================")
             self.processDict[key].start()
         # else:
         #     print("No more files in yield")

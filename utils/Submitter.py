@@ -120,12 +120,17 @@ class Submitter:
         keyToLoop: The updated list of processes keys which has to be in loop
         """
         out, err = self.processDict[key].communicate()
-        if out is None or err is None:
+        if not out and not err:
             return list(self.processDict.keys())
-        with open(f"{self.logDir}/output_{key}.out", "w") as f:
-            f.write(str(out))
-        with open(f"{self.logDir}/output_{key}.err", "w") as f:
-            f.write(str(err))
+
+        # Checks if the output is not empty
+        if out:
+            with open(f"{self.logDir}/output_{key}.out", "w") as f:
+                f.write(out.decode())
+        # Checks if the error is not empty
+        if err:
+            with open(f"{self.logDir}/output_{key}.err", "w") as f:
+                f.write(err.decode())
 
         self.deleteSingleProcess(key)
 
