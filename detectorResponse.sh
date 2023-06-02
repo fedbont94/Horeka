@@ -29,12 +29,12 @@ NumbFrames=0
 
 #################################### TODO ####################################
 # Energy range for the detector response
-energyStart=4.0
-energyEnd=6.0
+energyStart=6.0
+energyEnd=7.0
 
 # Parallelization
 parallelSim=100
-logDirProcesses="/home/hk-project-pevradio/rn8463/log/logDetResponse4069lv2_p2/"
+logDirProcesses="/home/hk-project-pevradio/rn8463/log/logDetResponse6070/"
 #################################### TODO ####################################
 
 ############### Generated #####################
