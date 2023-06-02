@@ -1,4 +1,3 @@
 #!/bin/sh
-sbatch -p multiple SubFile.sub
-# sbatch --partition=accelerated -A hk-project-pevradio SubFile.sub
+sbatch -p accelerated -A hk-project-radiohfi SubFile.sub
 # --ntasks-per-node=31 
