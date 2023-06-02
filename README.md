@@ -3,8 +3,23 @@ README.md multiple corsika simulations on Horeka
 @author: Federico Bontempo <federico.bontempo@kit.edu> \
 				 PhD student KIT Germany\
 @date: October 2022
--------------------------------------------------------------------------------
 
+Radio generator edits by Jelena
+-------------------------------------------------------------------------------
+When using these scripts, make sure to modify paths, usernames, etc. in these files:
+
+SubFile.sub\
+corsikaSim.sh\
+ExecuteSubfile.sh\
+utils/FileWriter.py\
+MakeCorsikaSim.py\
+
+Also check if you need to modify things in
+
+RadioFilesGenerator.py\
+SimulationMaker.py
+
+-------------------------------------------------------------------------------
 This folder contains all the necessary scripts to run a multiple corsika simulations and detector response simulations in a single submission.
 
 How to submit a job to the cluster:\
