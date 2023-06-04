@@ -94,11 +94,11 @@ class SimulationMaker:
                 + f"\nrm {self.fW.directories['inp']}/{log10_E}/SIM{runNumber}_coreas.bins"
                 # TODO check if you use mpi or not - the commands for executing corsika are different
                 # + f"\n{self.pathCorsika}/{self.corsikaExe} < {inpFile} > {logFile}" # This is how you execute a corsika file
-                + f"module load compiler/gnu/10.2"
-                + f"module load mpi/openmpi/4.1"
-                + f"\nmpirun --bind-to core:overload-allowed --map-by core -report-bindings {self.pathCorsika}/{self.corsikaExe} {inpFile} > {logFile}" # This is how you execute an mpi corsika file
-                + f"\n{mvDATfiles}" # Move the DAT files from inp directory to the data directory
-                # + f"\nrm {tempFile}" # It removes this temporary file since it is not needed anymore
+                # + f"module load compiler/gnu/10.2"
+                # + f"module load mpi/openmpi/4.1"
+                # + f"\nmpirun --bind-to core:overload-allowed --map-by core -report-bindings {self.pathCorsika}/{self.corsikaExe} {inpFile} > {logFile}" # This is how you execute an mpi corsika file
+                # + f"\n{mvDATfiles}" # Move the DAT files from inp directory to the data directory
+                + f"\nrm {tempFile}" # It removes this temporary file since it is not needed anymore
                 + f"\n "
             )
 

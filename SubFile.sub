@@ -4,7 +4,7 @@
 #SBATCH --error=/home/hk-project-radiohfi/bg5912/work/sims/GRAND/june/logs/_log%a.err
 #SBATCH --nodes=2
 #SBATCH --cpus-per-task=12
-#SBATCH --time=72:00:00
+#SBATCH --time=00:30:00
 #SBATCH --tasks=2
 ######SBATCH --mem=50gb
 ######SBATCH --export=NONE

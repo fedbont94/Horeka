@@ -248,7 +248,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--pathAntennas",
         type=str,
-        default="/home/hk-project-radiohfi/bg5912/Horeka_Jelena/utils/gp13.list",
+        default="/home/hk-project-radiohfi/bg5912/Horeka/utils/gp13.list",
         help="the directory where the antenna position file is located"
     )
 
