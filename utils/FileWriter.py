@@ -7,6 +7,7 @@ This class can be used to create and write a Corsika inp file and create "data",
 """
 import pathlib
 from utils.RadioFilesGenerator import RadioFilesGenerator
+from utils.SubFilesGenerator import SubFilesGenerator
 
 class FileWriter:
     """
@@ -139,6 +140,8 @@ class FileWriter:
                 + f"USER    {self.username}\n"
                 + f"EXIT\n")
         
+
+        # create the radio files
         RadGen = RadioFilesGenerator(
             obslev = self.obslev,
             directory = self.directories["inp"],
@@ -149,3 +152,13 @@ class FileWriter:
         )
 
         RadGen.writeReasList()
+
+
+        # create the .sub and .sh file for each shower
+        SubGen = SubFilesGenerator(
+            directory = self.directories["inp"],
+            runNumber = runNumber,
+            log10_E1 = log10_E1,
+        )
+
+        SubGen.writeSubFiles()
