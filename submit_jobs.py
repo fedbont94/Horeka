@@ -5,10 +5,11 @@ and modified by Jelena :)
 import os
 import subprocess
 import time
+import glob
 
-directory = '/path/to/directory'  # Replace with the desired directory path
-
-sub_files = [file for file in os.listdir(directory) if file.endswith('.sub')]
+directory = '/home/hk-project-radiohfi/bg5912/work/sims/GRAND/june/sim_storage/inp/'  # Replace with the desired directory path
+sub_files = glob.glob(directory + '/**/*.sub', recursive=True)
+# sub_files = [file for file in os.listdir(directory) if file.endswith('.sub')]
 
 while True:
     if sub_files:
