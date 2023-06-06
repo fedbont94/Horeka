@@ -98,11 +98,6 @@ def make_parser():
         default=120120000,
         help="The seed is the base seed which is 100_000 times the given dataset number",
     )
-    parser.add_argument(
-        "-doFiltering",
-        action="store_true",  # default False
-        help="Cut data with the trigger filtering. Useful for Level 0, 1 and 2",
-    )
     ############################## Energy ####################################
     parser.add_argument(
         "-energyStart", type=float, default=5.0, help="Lower limit of energy"
@@ -131,58 +126,10 @@ def make_parser():
     )
     ##################################################################
     parser.add_argument(
-        "--photonDirectory",
-        type=str,
-        default="/lsdf/kit/ikp/projects/IceCube/sim/photon-tables/",
-        help="The path where the photon library is located. Needed for the simulations",
-    )
-    parser.add_argument(
         "--NumbSamples",
         type=int,
         default=100,
         help="How many samples per run will be simulated by icetopshowergenerator.py [default: 100]",
-    )
-    parser.add_argument(
-        "--NumbFrames",
-        type=int,
-        default=0,
-        help="How many frames will be processed (0=unbound) [default: 0] ",
-    )
-    ############################# Scripts Extra Options #####################################
-    parser.add_argument(
-        "--doITSG",
-        action="store_true",
-        help="do you want to run ITShowerGenerator.py? deafualt: False",
-    )
-    parser.add_argument(
-        "--doInIceBg",
-        action="store_true",
-        help="do you want to run In-Ice background with Corsika and polyplopia? deafualt: False",
-    )
-    parser.add_argument(
-        "--doCLSIM",
-        action="store_true",
-        help="do you want to run clsim.py? deafualt: False",
-    )
-    parser.add_argument(
-        "--doDET",
-        action="store_true",
-        help="do you want to run detector.py? deafualt: False",
-    )
-    parser.add_argument(
-        "--doLV1",
-        action="store_true",
-        help="do you want to run SimulationFiltering.py? (level 1 simulation) deafualt: False",
-    )
-    parser.add_argument(
-        "--doLV2",
-        action="store_true",
-        help="do you want to run the process.py? (level 2 simulation) deafualt: False",
-    )
-    parser.add_argument(
-        "--doLV3",
-        action="store_true",
-        help="do you want to run level3_iceprod.py? (level 3 simulation) deafualt: False",
     )
     return parser.parse_args()
 
@@ -213,15 +160,11 @@ class ProcessRunner:
         submitter,
         energies,
         inDirectory,
-        doFiltering,
-        extraOptions={},
     ):
         self.detectorSim = detectorSim
         self.submitter = submitter
         self.energies = energies
         self.inDirectory = inDirectory
-        self.doFiltering = doFiltering
-        self.extraOptions = extraOptions
 
     def generatorKeys(self):
         """
@@ -250,126 +193,24 @@ class ProcessRunner:
                 runID = int(corsikaFile.partition("DAT")[-1][-5:])
                 runname = str(corsikaFile.partition("DAT")[-1])
                 procnum = index + 1
-                keyArgs = [energy, inDir + corsikaFile, runname, nproc, procnum, runID]
+                keyArgs = [energy, inDir + corsikaFile, runname, runID]
                 yield (f"{energy}_{runname}", keyArgs)
 
-    def run_processes(self, energy, corsikaFile, runname, nproc, procnum, runID):
+    def run_processes(self, energy, corsikaFile, runname, runID):
         """
         This functions can be edited and can be used for running all processes needed that can ebe found in DetectorSimulator
         If your function is not available, add it to the class and run it here.
         """
-        ##################################### ITShowerGenerator ##########################################
-        if self.extraOptions.get("doITSG"):
-            exeFile, ITSGFile = self.detectorSim.run_ITShowerGenerator(
-                energy=energy,
-                runname=runname,
-                inputFile=corsikaFile,
-                nproc=nproc,
-                procnum=procnum,
-                runID=runID,
-            )
-            if exeFile is not None:
-                print(energy, runname, "run_ITShowerGenerator")
-                self.executeFile(key=f"{energy}_{runname}_ITSG", exeFile=exeFile)
-            inputFile = ITSGFile
-        if self.extraOptions.get("doInIceBg"):
-            ####################################### corsika #################################################
-            exeFile, corsikaBgFile = self.detectorSim.run_corsikaBg(
-                energy=energy,
-                runname=runname,
-                nproc=nproc,
-                procnum=procnum,
-                CORSIKA_samples=100,
-            )
-            if exeFile is not None:
-                print(energy, runname, "run_CorsikaBg")
-                self.executeFile(key=f"{energy}_{runname}_CorsikaBg", exeFile=exeFile)
-
-            ####################################### polyplopia #############################################
-            exeFile, polyplopiaFile = self.detectorSim.run_polyplopia(
-                energy=energy,
-                runname=runname,
-                inputFile=inputFile,
-                backgroundfile=corsikaBgFile,  # "corsika_bg.i3.bz2",
-                MCTreeName="I3MCTree",
-                OutputMCTreeName="I3MCTree",
-                mctype="corsika",
-                TimeWindow=40,
-                log_level="INFO",
-                extraOptions="",
-            )
-            if exeFile is not None:
-                print(energy, runname, "run_polyplopia")
-                self.executeFile(key=f"{energy}_{runname}_polyplopia", exeFile=exeFile)
-            inputFile = polyplopiaFile
-
-        if self.extraOptions.get("doCLSIM"):
-            ####################################### clsim ########################################
-            exeFile, clsimFile = self.detectorSim.run_clsim(
-                energy=energy,
-                runname=runname,
-                inputFile=inputFile,
-                nproc=nproc,
-                procnum=procnum,
-                oversize=5,
-                efficiency=1.0,
-                icemodel="spice_3.2.1",
-            )
-            if exeFile is not None:
-                print(energy, runname, "run_clsim")
-                self.executeFile(key=f"{energy}_{runname}_clsim", exeFile=exeFile)
-            inputFile = clsimFile
-        ################################# detector ##############################################
-        if self.extraOptions.get("doDET"):
-            exeFile, DETFile = self.detectorSim.run_detector(
-                energy=energy,
-                runname=runname,
-                inputFile=inputFile,
-                nproc=nproc,
-                procnum=procnum,
-                runID=runID,
-                doFiltering=self.doFiltering,
-                mcprescale=1,
-                mctype="CORSIKA",
-            )
-            if exeFile is not None:
-                print(energy, runname, "run_detector")
-                self.executeFile(key=f"{energy}_{runname}_detector", exeFile=exeFile)
-        ################################### LV1 ############################################
-        if self.extraOptions.get("doLV1"):
-            exeFile, LV1File = self.detectorSim.run_lv1(
-                energy=energy,
-                runname=runname,
-                DETFile=DETFile,
-            )
-            if exeFile is not None:
-                print(energy, runname, "run_lv1")
-                self.executeFile(key=f"{energy}_{runname}_lv1", exeFile=exeFile)
-        ################################## LV2 #############################################
-        if self.extraOptions.get("doLV2"):
-            exeFile, LV2File = self.detectorSim.run_lv2(
-                energy=energy,
-                runname=runname,
-                LV1File=LV1File,
-                extraOptions=self.extraOptions.get("lv2"),
-            )
-            if exeFile is not None:
-                print(energy, runname, "run_lv2")
-                self.executeFile(key=f"{energy}_{runname}_lv2", exeFile=exeFile)
-        #################################### LV3 ###########################################
-        if self.extraOptions.get("doLV3"):
-            exeFile, LV3File = self.detectorSim.run_lv3(
-                energy=energy,
-                runname=runname,
-                LV2File=LV2File,
-                runID=runID,
-                extraOptions=self.extraOptions.get("lv3"),
-                domeff=1.0,
-            )
-            if exeFile is not None:
-                print(energy, runname, "run_lv3")
-                self.executeFile(key=f"{energy}_{runname}_lv3", exeFile=exeFile)
-        ###############################################################################
+        ##################################### ITExDefault ##########################################
+        exeFile, ITExFile = self.detectorSim.run_simITExDefault(
+            energy=energy,
+            runname=runname,
+            inputFile=corsikaFile,
+            runID=runID,
+        )
+        if exeFile is not None:
+            print(energy, runname, "run_simITExDefault")
+            self.executeFile(key=f"{energy}_{runname}_ITEx", exeFile=exeFile)
 
         return
 
@@ -416,12 +257,10 @@ def mainLoop(args):
         seed=args.seed,
         year=args.year,
         NumbSamples=args.NumbSamples,
-        NumbFrames=args.NumbFrames,
         i3build=args.i3build,
         outDirectory=args.outDirectory,
         detector=args.detector,  # "IC86"
         GCD=args.GCD,
-        photonDirectory=args.photonDirectory,
     )
 
     # The class that spawns the python processes by calling multiple python scipts at the same time.
@@ -437,16 +276,6 @@ def mainLoop(args):
         submitter=submitter,
         energies=energies,
         inDirectory=args.inDirectory,
-        doFiltering=args.doFiltering,
-        extraOptions={
-            "doITSG": args.doITSG,
-            "doInIceBg": args.doInIceBg,
-            "doCLSIM": args.doCLSIM,
-            "doDET": args.doDET,
-            "doLV1": args.doLV1,
-            "doLV2": args.doLV2,
-            "doLV3": args.doLV3,
-        },
     )
 
     # The class that runs the processes in parallel by calling all the functions one after the other.
