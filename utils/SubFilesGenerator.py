@@ -42,7 +42,7 @@ class SubFilesGenerator:
         sub_file = (f"{self.directory}/{self.log10_E1}/{sim}.sub")
         # and the corsika files
         inpFile = f"{self.directory}/{self.log10_E1}/{sim}.inp" # input file
-        logFile = f"{self.directory}/{self.log10_E1}/{dat}.log" # log file 
+        logFile = f"{self.directory}/{self.log10_E1}/{dat}.log" # log file #TODO: fix the path - it's going into inp now
 
         # find theta
         theta = self.zenith['start']
@@ -66,7 +66,7 @@ class SubFilesGenerator:
             ######Things that go into the sub file for Horeka#######
             file.write(""
                 + f"#!/bin/bash\n"
-                + f"#SBATCH --job-name={sim}\n" # job name is the sim number
+                + f"#SBATCH --job-name={self.runNumber}\n" # job name is the run number
                 + f"#SBATCH --output=/home/hk-project-radiohfi/bg5912/work/sims/GRAND/june/logs/_log%j.out\n"
                 + f"#SBATCH --error=/home/hk-project-radiohfi/bg5912/work/sims/GRAND/june/logs/_log%j.err\n"
                 + f"#SBATCH --nodes=2\n"
@@ -83,35 +83,8 @@ class SubFilesGenerator:
 
 
 
-    def shWriter(self):
-
-        # create the SIMxxxxxx ID
-        sim = f"SIM{self.runNumber}"
-
-        # This is the .sub file, which gets written into the folder
-        sub_file = (f"{self.directory}/{self.log10_E1}/{sim}.sub")
-        # and the .sh file
-        sh_file = (f"{self.directory}/{self.log10_E1}/{sim}.sh")
-        
-        # Opening and writing in the file 
-        with open(sh_file, "w") as file:
-            ######Things that go into the sh file for Horeka#######
-            file.write(""
-                + f"#!/bin/bash\n"
-                + f"sbatch -p cpuonly -A hk-project-radiohfi {sub_file}\n"
-                # specify the partition you want (e.g. cpuonly)
-                # specify the project you've been assigned to (e.g. radiohfi)
-            )
-            
-        # Make the file executable
-        st = os.stat(sh_file)
-        os.chmod(sh_file, st.st_mode | stat.S_IEXEC)
-
-
-
     def writeSubFiles(self):
         # define this to make it easier to call the functions
 
         self.subWriter()
-        self.shWriter()
         
