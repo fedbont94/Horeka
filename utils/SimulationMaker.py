@@ -79,12 +79,12 @@ class SimulationMaker:
         # when the simulation is completed
         mvDATfiles = f"mv {self.fW.directories['inp']}/{log10_E}/DAT{runNumber} {self.fW.directories['data']}/{log10_E}/DAT{runNumber}"
         
-        # Makes a temp file for the execution of corsika.
+        # Makes a temp file for submitting the jobs.
         tempFile = f"{self.fW.directories['temp']}/{log10_E}/temp_{runNumber}.sh"
         with open(tempFile, "w") as f:
             f.write(r"#!/bin/sh") # This shows that the file is an executable
             f.write(
-                f"\ncd {self.pathCorsika}" # You must execute corsika in its folder. Otherwise returns an error
+                f"\n"
                 # You must delete corsika non completed files. Otherwise returns an error and exits without executing the file 
                 + f"\nrm {self.fW.directories['inp']}/{log10_E}/DAT{runNumber}" # Removes the non-completed simulation file if already existing
                 + f"\nrm {self.fW.directories['inp']}/{log10_E}/DAT{runNumber}.long" # Removes the non-completed long file if already existing
@@ -92,14 +92,15 @@ class SimulationMaker:
                 # remove old radio files created by corsika
                 + f"\nrm -r {self.fW.directories['inp']}/{log10_E}/SIM{runNumber}_coreas"
                 + f"\nrm {self.fW.directories['inp']}/{log10_E}/SIM{runNumber}_coreas.bins"
-                # TODO check if you use mpi or not - the commands for executing corsika are different
-                # + f"\n{self.pathCorsika}/{self.corsikaExe} < {inpFile} > {logFile}" # This is how you execute a corsika file
-                # + f"module load compiler/gnu/10.2"
-                # + f"module load mpi/openmpi/4.1"
-                # + f"\nmpirun --bind-to core:overload-allowed --map-by core -report-bindings {self.pathCorsika}/{self.corsikaExe} {inpFile} > {logFile}" # This is how you execute an mpi corsika file
-                # + f"\n{mvDATfiles}" # Move the DAT files from inp directory to the data directory
-                + f"\nrm {tempFile}" # It removes this temporary file since it is not needed anymore
-                + f"\n "
+                """
+                submitting the sims here takes too long - it's probably really better to do one job per shower
+                so use this whole thing to create the input and sh files and then run those separately
+                """
+                # + f"\ncompiler/intel/19.1"
+                # + f"\nmpi/openmpi/4.0"
+                # + f"\n{self.fW.directories['inp']}/{log10_E}/SIM{runNumber}.sub"
+                # + f"\nrm {tempFile}" # It removes this temporary file since it is not needed anymore
+                + f"\n"
             )
 
 

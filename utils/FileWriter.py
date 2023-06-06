@@ -159,6 +159,8 @@ class FileWriter:
             directory = self.directories["inp"],
             runNumber = runNumber,
             log10_E1 = log10_E1,
+            pathCorsika = "/home/hk-project-radiohfi/bg5912/work/soft/corsika-77420/run/",
+            corsikaExe = "/mpi_corsika77420Linux_SIBYLL_urqmd_thin_coreas_parallel_runner",
         )
 
         SubGen.writeSubFiles()
