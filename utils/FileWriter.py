@@ -120,7 +120,7 @@ class FileWriter:
                 + f"THETAP  {self.zenith['start']}    {self.zenith['start']}\n"  
                 + f"PHIP    {self.azimuth['start']} {self.azimuth['end']}\n"  
                 + f"ECUTS   3.0000e-01 5.0000e-02 2.5000e-04  2.5000e-04\n"
-                + f"PARALLEL 1E0 1E3 1 F\n" #1E3 1E5 1 F
+                + f"PARALLEL 1E3 1E5 1 F\n" #1E3 1E5 1 F #1E0 1E3
                 + f"ELMFLG  T    T\n"   # Disable NKG since it gets deactivated anyway when CURVED is selected at corsika setup
                 + f"THIN    {thin1} {thin1 * en1:.11E} 0.000000e+00\n" # ERANGE * THIN1 = THIN2 # {thin1} {thin1 * en1:.11E} 5.000000e+03\n
                 + f"THINH   1.000E+00 1.000E+00\n"#1.000E+02 1.000E+02
