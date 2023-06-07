@@ -63,12 +63,15 @@ class SimulationMaker:
                 # EEiiii where EE is the energy in log10/GeV *10 
                 # and iiii is the run index number. 
                 runNumber = int(log10_E1 * 10_000 * 10 + runIndex) 
+                # TODO: check runID here!
                 #remove the *10 for energies above 10 - otherwise the filenames are messed up
                 
-                # Check if this simulation is not in data. Thus, was already created
+                # Check if this COREAS (!) simulation is not in inp. 
+                # If so, this simulation was already created
                 # There is thus no need to redo it
-                if f"DAT{runNumber}" not in os.listdir(
-                    f"{self.fW.directories['data']}/{log10_E1}/"
+                if f"SIM{runNumber}_coreas" not in os.listdir(
+                    f"{self.fW.directories['inp']}/{log10_E1}//"
+
                 ):
                     # It writes the Corsika input file 
                     self.fW.writeFile(runNumber, log10_E1, log10_E2)
@@ -83,9 +86,6 @@ class SimulationMaker:
         # A few paths to files are defined. 
         inpFile = f"{self.fW.directories['inp']}/{log10_E}/SIM{runNumber}.inp" # input file
         logFile = f"{self.fW.directories['log']}/{log10_E}/DAT{runNumber}.log" # log file 
-        # The move command which moves the file from the temporary directory to the data directory 
-        # when the simulation is completed
-        mvDATfiles = f"mv {self.fW.directories['inp']}/{log10_E}/DAT{runNumber} {self.fW.directories['data']}/{log10_E}/DAT{runNumber}"
         
         # Makes a temp file for submitting the jobs.
         tempFile = f"{self.fW.directories['temp']}/{log10_E}/temp_{runNumber}.sh"
