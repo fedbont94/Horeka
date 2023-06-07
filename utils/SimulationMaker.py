@@ -6,6 +6,14 @@ made via the combinations of file and energies
 
 @author: Federico Bontempo <federico.bontempo@kit.edu> PhD student KIT Germany
 @date: October 2022
+
+edited for radio by Jelena
+
+Submitting the sims with this program takes too long with Corsika :(
+It's actually better to do one job per shower - for Coreas at least.
+So FOR RADIO: use this whole thing to create the input and sh files 
+and then run those separately using submit_jobs.py
+
 """
 import numpy as np
 import os
@@ -92,14 +100,7 @@ class SimulationMaker:
                 # remove old radio files created by corsika
                 + f"\nrm -r {self.fW.directories['inp']}/{log10_E}/SIM{runNumber}_coreas"
                 + f"\nrm {self.fW.directories['inp']}/{log10_E}/SIM{runNumber}_coreas.bins"
-                """
-                submitting the sims here takes too long - it's probably really better to do one job per shower
-                so use this whole thing to create the input and sh files and then run those separately
-                """
-                # + f"\ncompiler/intel/19.1"
-                # + f"\nmpi/openmpi/4.0"
-                # + f"\n{self.fW.directories['inp']}/{log10_E}/SIM{runNumber}.sub"
-                # + f"\nrm {tempFile}" # It removes this temporary file since it is not needed anymore
+                + f"\nrm -r {self.fW.directories['data']}" # not used in radio
                 + f"\n"
             )
 

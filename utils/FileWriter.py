@@ -65,7 +65,7 @@ class FileWriter:
         Parameters:
             log10_E1: the log10 of the Energy value for the subfolder creation        
         """
-        for folder in ["temp", "log", "inp"]:
+        for folder in ["data", "temp", "log", "inp"]:
             self.directories[folder] = f"{self.directories['sim']}/{folder}/"
             # Creates the required directories in case they are not existing
             pathlib.Path(f"{self.directories[folder]}/{log10_E1}").mkdir(parents=True, exist_ok=True)
