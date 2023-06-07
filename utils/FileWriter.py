@@ -156,7 +156,8 @@ class FileWriter:
 
         # create the .sub and .sh file for each shower
         SubGen = SubFilesGenerator(
-            directory = self.directories["inp"],
+            inpdir = self.directories["inp"],
+            logdir = self.directories["log"],
             runNumber = runNumber,
             log10_E1 = log10_E1,
             pathCorsika = "/home/hk-project-radiohfi/bg5912/work/soft/corsika-77420/run/",

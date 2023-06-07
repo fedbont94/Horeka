@@ -5,7 +5,8 @@ import stat
 class SubFilesGenerator:
 
     def __init__(self,
-        directory,                  # inp directory
+        inpdir,
+        logdir,
         runNumber,                  
         log10_E1,
         zenith ={'start': 65.00000000,  # Lower limit of azimuth (do not change unless you know what you are doing)
@@ -14,7 +15,8 @@ class SubFilesGenerator:
         corsikaExe = "/mpi_corsika77420Linux_SIBYLL_urqmd_thin_coreas_parallel_runner",
         
     ):
-        self.directory = directory
+        self.inpdir = inpdir
+        self.logdir = logdir
         self.runNumber = runNumber
         self.log10_E1 = log10_E1
 
@@ -39,10 +41,10 @@ class SubFilesGenerator:
         dat = f"DAT{self.runNumber}"
 
         # This is the .sub file, which gets written into the folder
-        sub_file = (f"{self.directory}/{self.log10_E1}/{sim}.sub")
+        sub_file = (f"{self.inpdir}/{self.log10_E1}/{sim}.sub")
         # and the corsika files
-        inpFile = f"{self.directory}/{self.log10_E1}/{sim}.inp" # input file
-        logFile = f"{self.directory}/{self.log10_E1}/{dat}.log" # log file #TODO: fix the path - it's going into inp now
+        inpFile = f"{self.inpdir}/{self.log10_E1}/{sim}.inp" # input file
+        logFile = f"{self.logdir}/{self.log10_E1}/{dat}.log" # log file
 
         # find theta
         theta = self.zenith['start']
