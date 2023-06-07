@@ -22,8 +22,8 @@ $PYTHON $SCRIPT \
                 --corsikaExe "/mpi_corsika77420Linux_SIBYLL_urqmd_thin_coreas_parallel_runner" \
                 --startNumber 0 \
                 --endNumber 10 \
-                --energyStart 8.0 \
-                --energyEnd 9.0 \
+                --energyStart 9.0 \
+                --energyEnd 10.0 \
                 --energyStep 0.1 \
                 --azimuthStart 0.00000000 \
                 --azimuthEnd 90.0000000 \
