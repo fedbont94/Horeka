@@ -5,10 +5,11 @@ README.md multiple corsika simulations on Horeka
 @date: October 2022
 
 Radio generator edits by Jelena
-Submitting the sims with this program takes too long with Corsika :(
-It's actually better to do one job per shower - for Coreas at least.
-So FOR RADIO: use this whole thing to create the input and sh files 
-and then run those separately using submit_jobs.py
+
+Submitting the sims with this program takes too long with Corsika :( \
+It's actually better to do one job per shower - for Coreas at least. \
+So FOR RADIO: use this whole thing to create the input and sh files \
+and then run those separately using submit_jobs.py \
 
 -------------------------------------------------------------------------------
 When using these scripts, make sure to modify paths, usernames, etc. in these files:
