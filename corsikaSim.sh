@@ -29,7 +29,7 @@ $PYTHON $SCRIPT \
                 --azimuthEnd 90.0000000 \
                 --zenithStart 0.00000000 \
                 --zenithEnd 180.00000000 \
-                --obslev 200 \
+                --obslev 1200 \
                 --logDirProcesses "/home/hk-project-radiohfi/bg5912/work/sims/GRAND/june/logs/" \
                 --parallelSim 1
 

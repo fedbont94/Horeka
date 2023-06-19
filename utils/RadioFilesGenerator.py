@@ -109,11 +109,10 @@ class RadioFilesGenerator:
         file = np.genfromtxt(self.pathAntennas, dtype = "str")
         # get antenna positions from file
         # file[:,0] and file[:,1] are useless (they are simply "AntennaPosition" and "=")
-        # get the x and y positions
+        # get the x, y and z positions
         self.antennaInfo["x"] = file[:,2].astype(float) + dx
         self.antennaInfo["y"] = file[:,3].astype(float) + dy
-        # replace the z component with the observation level
-        self.antennaInfo["z"] = np.full(self.antennaInfo["x"].shape[0], self.obslev)
+        self.antennaInfo["z"] = file[:,4].astype(float)
         # get the names of the antennas
         self.antennaInfo["name"] = file[:,5]
 
@@ -130,11 +129,10 @@ class RadioFilesGenerator:
         file = np.genfromtxt(self.pathStarshapes, dtype = "str")
         # get antenna positions from file
         # file[:,0] and file[:,1] are useless (they are simply "AntennaPosition" and "=")
-        # get the x and y positions
+        # get the x, y and z positions
         self.starshapeInfo["x"] = file[:,2].astype(float)
         self.starshapeInfo["y"] = file[:,3].astype(float)
-        # replace the z component with the observation level
-        self.starshapeInfo["z"] = np.full(self.starshapeInfo["x"].shape[0], self.obslev)
+        self.starshapeInfo["z"] = file[:,4].astype(float)
         # get the names of the antennas
         self.starshapeInfo["name"] = file[:,5]
 
@@ -153,8 +151,8 @@ class RadioFilesGenerator:
             for i in range(self.antennaInfo["x"].shape[0]):
                 f.write(f"AntennaPosition = {self.antennaInfo['x'][i]} {self.antennaInfo['y'][i]} {self.antennaInfo['z'][i]} {self.antennaInfo['name'][i]}\n") 
             # write the positions (x, y, z) and names of the starshape antennas to the .list file
-            # for i in range(self.starshapeInfo["x"].shape[0]):
-            #     f.write(f"AntennaPosition = {self.starshapeInfo['x'][i]} {self.starshapeInfo['y'][i]} {self.starshapeInfo['z'][i]} {self.starshapeInfo['name'][i]}\n") 
+            for i in range(self.starshapeInfo["x"].shape[0]):
+                f.write(f"AntennaPosition = {self.starshapeInfo['x'][i]} {self.starshapeInfo['y'][i]} {self.starshapeInfo['z'][i]} {self.starshapeInfo['name'][i]}\n") 
             
 
     def writeReasList(self):
