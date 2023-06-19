@@ -129,10 +129,11 @@ class RadioFilesGenerator:
         file = np.genfromtxt(self.pathStarshapes, dtype = "str")
         # get antenna positions from file
         # file[:,0] and file[:,1] are useless (they are simply "AntennaPosition" and "=")
-        # get the x, y and z positions
+        # get the x and y positions
         self.starshapeInfo["x"] = file[:,2].astype(float)
         self.starshapeInfo["y"] = file[:,3].astype(float)
-        self.starshapeInfo["z"] = file[:,4].astype(float)
+        # replace the z component with the observation level
+        self.starshapeInfo["z"] = np.full(self.starshapeInfo["x"].shape[0], self.obslev)
         # get the names of the antennas
         self.starshapeInfo["name"] = file[:,5]
 
