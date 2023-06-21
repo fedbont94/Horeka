@@ -116,16 +116,16 @@ class FileWriter:
                 + f"SEED    {seed6}    0    0\n"  #
                 + f"NSHOW   1\n"
                 + f"PRMPAR  {self.primary}\n"
-                + f"ERANGE  {en1:.11E}    {en2:.11E}\n"  # in GeV
+                + f"ERANGE  {en1:.11E}    {en1:.11E}\n"  # in GeV
                 + f"THETAP  {self.zenith['start']}    {self.zenith['start']}\n"  
-                + f"PHIP    {self.azimuth['start']} {self.azimuth['end']}\n"  
-                + f"ECUTS   3.0000e-01 5.0000e-02 2.5000e-04  2.5000e-04\n"
+                + f"PHIP    {self.azimuth['start']} {self.azimuth['start']}\n"  
+                + f"ECUTS   0.500E+00 0.500E+00 3.000E-03 3.000E-03\n"
                 + f"PARALLEL 1E3 1E5 1 F\n" #1E3 1E5 1 F #1E0 1E3
                 + f"ELMFLG  T    T\n"   # Disable NKG since it gets deactivated anyway when CURVED is selected at corsika setup
                 + f"THIN    {thin1} {thin1 * en1:.11E} 0.000000e+00\n" # ERANGE * THIN1 = THIN2 # {thin1} {thin1 * en1:.11E} 5.000000e+03\n
                 + f"THINH   1.000E+00 1.000E+00\n"#1.000E+02 1.000E+02
                 + f"STEPFC  1.0\n"
-                + f"OBSLEV  {self.obslev}\n"  # 1549700 for Dunhuang  # 1142.0E2 elevation Dunhuang (hopefully close enough to Xiaodushan, which I can't find)
+                + f"OBSLEV  {self.obslev}\n"  # 1549700 for Dunhuang?  # 1142.0E2 elevation Dunhuang (hopefully close enough to Xiaodushan, which I can't find)
                 + f"ECTMAP  1.E+15\n"#1.E+05
                 + f"MUMULT  T\n"
                 + f"MUADDI  T\n"
