@@ -9,8 +9,7 @@ class SubFilesGenerator:
         logdir,
         runNumber,                  
         log10_E1,
-        zenith ={'start': 65.00000000,  # Lower limit of azimuth (do not change unless you know what you are doing)
-                 'end': 85.0000000},    # Upper limit of azimuth (do not change unless you know what you are doing)
+        zenith,
         pathCorsika = "/home/hk-project-radiohfi/bg5912/work/soft/corsika-77420/run/",
         corsikaExe = "/mpi_corsika77420Linux_SIBYLL_urqmd_thin_coreas_parallel_runner",
         
@@ -47,20 +46,20 @@ class SubFilesGenerator:
         logFile = f"{self.logdir}/{self.log10_E1}/{dat}.log" # log file
 
         # find theta
-        theta = self.zenith['start']
+        theta = self.zenith
 
         # specify runtime according to theta
         # larger theta require more runtime
-        if theta >= 70:
-            runtime = "04:00:00"
-        elif theta >= 75:
+        if theta >= 65:
             runtime = "06:00:00"
+        elif theta >= 75:
+            runtime = "08:00:00"
         elif theta >= 77.5:
             runtime = "10:00:00"
         elif theta >= 80:
             runtime = "30:00:00"
         else:
-            runtime = "03:00:00"
+            runtime = "05:00:00"
 
 
         # Opening and writing in the file 
