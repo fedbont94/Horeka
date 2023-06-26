@@ -1,3 +1,16 @@
+#!/usr/bin/env python3
+
+"""
+This class generates the additional input files needed for CoREAS.
+The .reas file specifies core position (and other info).
+The .list file contains the antenna positions and names of the detector.
+In this generator, starshape and detector antennas (e.g. GP13) are combined.
+The core position and the center of the starshape array are fixed on 0, while
+the detector antennas are moved at random for each run.
+
+@author: Jelena
+"""
+
 import numpy as np
 import random
 
@@ -23,16 +36,6 @@ class RadioFilesGenerator:
 
 
         """
-        Generate files for CoREAS 
-        (by Jelena)
-
-        This class generates the additional input files needed for CoREAS.
-        The .reas file specifies core position (and other info).
-        The .list file contains the antenna positions and names of the detector.
-        In this generator, starshape and detector antennas (e.g. GP13) are combined.
-        The core position and the center of the starshape array are fixed on 0, while
-        the detector antennas are moved at random for each run.
-
         For CoREAS it's important that all input files (inp, reas and list) are stored in the same directory.
         CoREAS uses the same directory for input and output (keyword DIRECT in .inp file) and this cannot be 
         changed.
@@ -152,8 +155,8 @@ class RadioFilesGenerator:
             for i in range(self.antennaInfo["x"].shape[0]):
                 f.write(f"AntennaPosition = {self.antennaInfo['x'][i]} {self.antennaInfo['y'][i]} {self.antennaInfo['z'][i]} {self.antennaInfo['name'][i]}\n") 
             # write the positions (x, y, z) and names of the starshape antennas to the .list file
-            for i in range(self.starshapeInfo["x"].shape[0]):
-                f.write(f"AntennaPosition = {self.starshapeInfo['x'][i]} {self.starshapeInfo['y'][i]} {self.starshapeInfo['z'][i]} {self.starshapeInfo['name'][i]}\n") 
+            # for i in range(self.starshapeInfo["x"].shape[0]):
+            #     f.write(f"AntennaPosition = {self.starshapeInfo['x'][i]} {self.starshapeInfo['y'][i]} {self.starshapeInfo['z'][i]} {self.starshapeInfo['name'][i]}\n") 
             
 
     def writeReasList(self):
