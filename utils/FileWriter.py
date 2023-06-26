@@ -66,7 +66,6 @@ class FileWriter:
         Creates and writes a Corsika inp file that can be used as Corsika input
         """
         en1 = 10**log10_E1  # Lower limit of energy in GeV
-        en2 = 10**log10_E2  # Upper limit of energy in GeV    
         
         # The seed value in Corsika is 1 <= seed <= 900_000_000; 
         # It was decided to adopt the following seed has the form: 
