@@ -22,13 +22,11 @@ $PYTHON $SCRIPT \
                 --corsikaExe "/mpi_corsika77420Linux_SIBYLL_urqmd_thin_coreas_parallel_runner" \
                 --startNumber 0 \
                 --endNumber 10 \
-                --energyStart 9.0 \
-                --energyEnd 10.0 \
+                --energyStart 10.0 \
+                --energyEnd 10.9 \
                 --energyStep 0.1 \
-                --azimuthStart 0.00000000 \
-                --azimuthEnd 90.0000000 \
-                --zenithStart 0.00000000 \
-                --zenithEnd 180.00000000 \
+                --azimuth 0.00000000 \
+                --zenith 65.00000000 \
                 --obslev 1200 \
                 --logDirProcesses "/home/hk-project-radiohfi/bg5912/work/sims/GRAND/june/logs/" \
                 --parallelSim 1

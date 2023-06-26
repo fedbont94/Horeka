@@ -14,16 +14,6 @@ class FileWriter:
     This class can be used to create and write a Corsika inp file 
     and create "data", "temp", "log", "inp" folders.
     
-    Parameters:
-        username,                       # User name on server
-        dirSimulations,                 # Simulations directory where the data temp and log folder will be created
-        primary,                        # 1 is gamma, 14 is proton, 402 is He, 1608 is Oxygen, 5626 is Fe
-        dataset,                        # changed on 28 Jan 2020 according to IC std: 13000.0 H, 13100 He, 13200 O, 13300 Fe, 13400 Gamma
-  
-        azimuth={'start': 0.00000000,   # Lower limit of zenith (do not change unless you know what you are doing)
-                 'end': 359.99000000},  # Upper limit of zenith (do not change unless you know what you are doing)
-        zenith ={'start': 0.00000000,   # Lower limit of azimuth (do not change unless you know what you are doing)
-                 'end': 65.0000000},    # Upper limit of azimuth (do not change unless you know what you are doing)
     """
     
 
@@ -39,10 +29,8 @@ class FileWriter:
         obslev,                         # Observation level in cm
         pathStarshapes,                 # Path to starshapes
         pathAntennas,                   # Path to antennas
-        azimuth={'start': 0.00000000,   # Lower limit of zenith (do not change unless you know what you are doing)
-                 'end': 180.00000000},  # Upper limit of zenith (do not change unless you know what you are doing)
-        zenith ={'start': 65.00000000,  # Lower limit of azimuth (do not change unless you know what you are doing)
-                 'end': 85.0000000},    # Upper limit of azimuth (do not change unless you know what you are doing)
+        azimuth,                        # zenith angle
+        zenith,                         # azimuth angle
     ):
         self.dataset = dataset
         self.username = username
@@ -91,7 +79,7 @@ class FileWriter:
         sim = f"SIM{runNumber}"
 
         # This is the inp file, which gets written into the folder
-        inp_name = (f"{self.directories['inp']}/{log10_E1}/{sim}.inp")  
+        inp_name = (f"{self.directories['inp']}/{log10_E1}/{sim}.inp")
         
         seed1 = seedValue  # int(np.random.normal(mu, sigma))#random chosen)  #changed on 28 Jan 2020 according to IC std
         seed2 = seed1 + 1
@@ -101,6 +89,8 @@ class FileWriter:
         seed6 = seed1 + 5
 
         thin1 = 1.000E-06
+
+        # TODO: zenith and azimuth need to be chosen at random
 
         # Opening and writing in the file 
         with open(inp_name, "w") as file:
@@ -117,8 +107,8 @@ class FileWriter:
                 + f"NSHOW   1\n"
                 + f"PRMPAR  {self.primary}\n"
                 + f"ERANGE  {en1:.11E}    {en1:.11E}\n"  # in GeV
-                + f"THETAP  {self.zenith['start']}    {self.zenith['start']}\n"  
-                + f"PHIP    {self.azimuth['start']} {self.azimuth['start']}\n"  
+                + f"THETAP  {self.zenith}    {self.zenith}\n"  
+                + f"PHIP    {self.azimuth} {self.azimuth}\n"  
                 + f"ECUTS   0.500E+00 0.500E+00 3.000E-03 3.000E-03\n"
                 + f"PARALLEL 1E3 1E5 1 F\n" #1E3 1E5 1 F #1E0 1E3
                 + f"ELMFLG  T    T\n"   # Disable NKG since it gets deactivated anyway when CURVED is selected at corsika setup
@@ -160,6 +150,7 @@ class FileWriter:
             logdir = self.directories["log"],
             runNumber = runNumber,
             log10_E1 = log10_E1,
+            zenith = self.zenith,
             pathCorsika = "/home/hk-project-radiohfi/bg5912/work/soft/corsika-77420/run/",
             corsikaExe = "/mpi_corsika77420Linux_SIBYLL_urqmd_thin_coreas_parallel_runner",
         )

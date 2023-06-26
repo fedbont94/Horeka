@@ -105,12 +105,12 @@ def mainCorsikaSim(args):
         primary=args.primary,                   # 1 is gamma, 14 is proton, 402 is He, 1608 is Oxygen, 5626 is Fe
         dataset=args.dataset,                   # changed on 28 Jan 2020 according to IC std: 13000.0 +000 H, +100 He, +200 O, +300 Fe, +400 Gamma
         primIdDict = args.primIdDict,
-        
-        azimuth={'start': args.azimuthStart,    # Lower limit of zenith (do not change unless you know what you are doing)
-                 'end': args.azimuthEnd},       # Upper limit of zenith (do not change unless you know what you are doing)
-        zenith ={'start': args.zenithStart,     # Lower limit of azimuth (do not change unless you know what you are doing)
-                 'end': args.zenithEnd},        # Upper limit of azimuth (do not change unless you know what you are doing)
+    
+        azimuth=args.azimuth,
+        zenith =args.zenith,
+
         obslev =args.obslev,
+
         pathAntennas=args.pathAntennas,
         pathStarshapes=args.pathStarshapes,
     )
@@ -214,28 +214,17 @@ if __name__ == "__main__":
     )
 
     parser.add_argument(
-        "--azimuthStart", 
+        "--azimuth", 
         type=float, 
         default=0.00000000, 
-        help="Lower limit of azimuth (do not change unless you know what you are doing)"
+        help="Value of azimuth (do not change unless you know what you are doing)"
     )
+
     parser.add_argument(
-        "--azimuthEnd", 
+        "--zenith", 
         type=float, 
-        default=359.99000000, 
-        help="Upper limit of azimuth (do not change unless you know what you are doing)"
-    )
-    parser.add_argument(
-        "--zenithStart", 
-        type=float, 
-        default=0.00000000, 
-        help="Lower limit of zenith (do not change unless you know what you are doing)"
-    )
-    parser.add_argument(
-        "--zenithEnd", 
-        type=float, 
-        default=65.0000000, 
-        help="Upper limit of zenith (do not change unless you know what you are doing)"
+        default=65.00000000, 
+        help="Value of zenith (do not change unless you know what you are doing)"
     )
 
     parser.add_argument(
