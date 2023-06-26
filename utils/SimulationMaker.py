@@ -21,7 +21,7 @@ import stat
 
 class SimulationMaker:
     """
-    This class has to useful functions. 
+    This class has two useful functions. 
         generator: which yields a key and a string to submit 
         makeStringToSubmit: which writes a temporary file and a string to submit
     
@@ -56,15 +56,10 @@ class SimulationMaker:
             self.fW.makeFolders(log10_E1)
 
             # It loops over all the unique numbers 
-            # for procNumber, runNumber in zip(binArray[:-1], binArray[1:]):
             for runIndex in range(self.startNumber, self.endNumber):
                 # Creates the file name for the simulation
-                # The runNumber is calculated as follows:
-                # EEiiii where EE is the energy in log10/GeV *10 
-                # and iiii is the run index number. 
+                # TODO: update runNumber
                 runNumber = int(log10_E1 * 10_000 * 10 + runIndex) 
-                # TODO: check runID here!
-                #remove the *10 for energies above 10 - otherwise the filenames are messed up
                 
                 # Check if this COREAS (!) simulation is not in inp. 
                 # If so, this simulation was already created
