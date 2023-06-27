@@ -7,7 +7,9 @@ made via the combinations of file and energies
 @author: Federico Bontempo <federico.bontempo@kit.edu> PhD student KIT Germany
 @date: October 2022
 
-edited for radio by Jelena
+edited for radio by 
+@author: Jelena
+@date: June 2023
 
 Submitting the sims with this program takes too long with Corsika :(
 It's actually better to do one job per shower - for Coreas at least.
@@ -18,6 +20,7 @@ and then run those separately using submit_jobs.py
 import numpy as np
 import os
 import stat
+from utils.runNumberGenerator import runNumberGenerator
 
 class SimulationMaker:
     """
@@ -35,13 +38,30 @@ class SimulationMaker:
         corsikaExe:     the name of the Corsika executable that needs to be used
     
     """
-    def __init__(self, startNumber, endNumber, energies, fW, pathCorsika, corsikaExe):
+    def __init__(self, 
+                 startNumber, 
+                 endNumber, 
+                 energies, 
+                 fW, 
+                 pathCorsika, 
+                 corsikaExe, 
+                 zenith, 
+                 azimuth, 
+                 primary_particle
+    ):
+        
         self.startNumber = startNumber
         self.endNumber = endNumber
         self.energies = energies
         self.fW = fW
         self.pathCorsika = pathCorsika
         self.corsikaExe = corsikaExe
+        self.zenith = zenith
+        self.azimuth = azimuth
+        self.primary_particle = primary_particle
+        self.runNumGen = runNumberGenerator()
+
+
 
     def generator(self):
         """
@@ -58,8 +78,13 @@ class SimulationMaker:
             # It loops over all the unique numbers 
             for runIndex in range(self.startNumber, self.endNumber):
                 # Creates the file name for the simulation
-                # TODO: update runNumber
-                runNumber = int(log10_E1 * 10_000 * 10 + runIndex) 
+                particleID = self.runNumGen.getPrimaryID(self.primary_particle)
+                zenithID = self.runNumGen.getZenithID(self.zenith)
+                azimuthID = self.runNumGen.getAzimuthID(self.azimuth)
+                # 
+                print(particleID, azimuthID, runIndex)
+                runNumber = format(int(particleID * 1E5 + zenithID * 1E4 + azimuthID * 1E3 + runIndex), '06d')
+                print(runNumber)
                 
                 # Check if this COREAS (!) simulation is not in inp. 
                 # If so, this simulation was already created
@@ -76,6 +101,8 @@ class SimulationMaker:
                     # It calls the function to create a sting which will be used for the job execution
                     stringToSubmit = self.makeStringToSubmit(log10_E1, runNumber)
                     yield (key, stringToSubmit)
+
+
 
     def makeStringToSubmit(self, log10_E, runNumber):
         # A few paths to files are defined. 

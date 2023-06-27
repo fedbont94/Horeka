@@ -108,7 +108,6 @@ def mainCorsikaSim(args):
     
         azimuth=args.azimuth,
         zenith =args.zenith,
-
         obslev =args.obslev,
 
         pathAntennas=args.pathAntennas,
@@ -122,6 +121,10 @@ def mainCorsikaSim(args):
         fW=fW, # The fileWriter class 
         pathCorsika = args.pathCorsika,
         corsikaExe = args.corsikaExe,
+
+        zenith = args.zenith,
+        azimuth = args.azimuth,
+        primary_particle = args.primary,
     )
 
     submitter = Submitter(

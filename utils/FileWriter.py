@@ -72,7 +72,7 @@ class FileWriter:
         # pprrrrrr where pp is the primary ID (0, 1, 2...) and rrrrrr is the 6-digit run number
         # The seedValue is % 900.000.000 so that it does not exceed the max allowed seed value in Corsika
         # Note underscore do not change anything in the python numbers, they just make them easier to read
-        seedValue = int((runNumber + self.primIdDict[self.primary]*1_000_000) % 900_000_001) 
+        seedValue = int((int(runNumber) + self.primIdDict[self.primary]*1_000_000) % 900_000_001) 
 
         # create the SIMxxxxxx ID
         sim = f"SIM{runNumber}"
