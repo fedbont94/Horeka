@@ -28,7 +28,7 @@ RunNumber: <012345>
 
 """
 
-class RunNumberGenerator:
+class runNumberGenerator:
     """
     This class has functions that are used to create the runNumber in SimulationMaker.py.
         
@@ -42,27 +42,27 @@ class RunNumberGenerator:
     def __init__(self):
 
         self.zenithDict = {
-                            0: 65,   # 65° get ID 0
-                            1: 67.5, # and so forth
-                            2: 70,
-                            3: 72.5,
-                            4: 75,
-                            5: 77.5,
-                            6: 80,
-                            7: 82.5,
-                            8: 85,
+                             65.0 : 0,
+                             67.5 : 1,
+                             70.0 : 2,
+                             72.5 : 3,
+                             75.0 : 4,
+                             77.5 : 5,
+                             80.0 : 6,
+                             82.5 : 7,
+                             85.0 : 8,
                                     }
         
         self.azimuthDict = {
-                            0: 0,   # 0° get ID 0
-                            1: 45,  # and so forth
-                            2: 90,
-                            3: 135,
-                            4: 180,
-                            5: 225,
-                            6: 270,
-                            7: 315,
-                            8: 360,
+                             0.0  : 0,
+                             45.0 : 1,
+                             90.0 : 2,
+                             135.0: 3,
+                             180.0: 4,
+                             225.0: 5,
+                             270.0: 6,
+                             315.0: 7,
+                             360.0: 8,
                                     }
         
         # TODO: update for more particles
@@ -74,36 +74,15 @@ class RunNumberGenerator:
 
 
     def getZenithID(self, zenith_angle):
-        zenithID = None
-        for key, value in self.zenithDict.items():
-            if value == zenith_angle:
-                zenithID = key
-                break
-        return zenithID
+        return self.zenithDict[zenith_angle]
     
 
     
     def getAzimuthID(self, azimuth_angle):
-        azimuthID = None
-        for key, value in self.azimuthDict.items():
-            if value == azimuth_angle:
-                azimuthID = key
-                break
-        return azimuthID
+        return self.azimuthDict[azimuth_angle]
     
 
 
     def getPrimaryID(self, primary_particle):
-        primaryID = None
-        for key, value in self.zenithDict.items():
-            if value == primary_particle:
-                primaryID = key
-                break
-        return primaryID
+        return self.primaryDict[primary_particle]
     
-
-    def getEnergyID(self, energy):
-        energy = round(energy, 1)  # Truncate energy to one decimal place
-        energyID = int(energy*10) # now the energyID has two digits
-
-        return energyID
