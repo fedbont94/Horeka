@@ -512,6 +512,7 @@ class DetectorSimulator:
         extraOptions="",
         mcprescale=1,
         mctype="CORSIKA",
+        return_name=False,
     ):
         """
         Runs the detector.py scripts with the default options
@@ -534,10 +535,13 @@ class DetectorSimulator:
 
         """
 
-        self.checkIfInputExists(inputFile)
-
         outputFolder = f"{self.outDirectory}/generated/detector"
         outputFolder += f"/Detector_{self.detector}_corsika_icetop.{self.MCdataset}/"
+
+        if return_name:
+            return f"{outputFolder}/data/{energy}/{runname}.i3.bz2"
+
+        self.checkIfInputExists(inputFile)
 
         DETdataFile = (
             f"{outputFolder}/data/{energy}/{runname}.i3.bz2"  # Path and File name
@@ -664,6 +668,7 @@ class DetectorSimulator:
         runname,
         LV1File,
         extraOptions="",
+        return_name=False,
     ):
         """
         Runs the level2.py scripts with the default options
@@ -678,10 +683,13 @@ class DetectorSimulator:
             exeFile: the file that need to be executed
 
         """
-
-        self.checkIfInputExists(LV1File)
         outputFolder = f"{self.outDirectory}/filtered/level2"
         outputFolder += f"/Level2_{self.detector}_corsika_icetop.{self.MCdataset}/"
+
+        if return_name:
+            return f"{outputFolder}/data/{energy}/{runname}.i3.bz2"
+
+        self.checkIfInputExists(LV1File)
 
         LV2dataFile = (
             f"{outputFolder}/data/{energy}/{runname}.i3.bz2"  # Path and File name

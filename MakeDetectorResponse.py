@@ -337,6 +337,18 @@ class ProcessRunner:
                 self.executeFile(key=f"{energy}_{runname}_detector", exeFile=exeFile)
         ################################### LV1 ############################################
         if self.extraOptions.get("doLV1"):
+            DETFile = self.detectorSim.run_detector(
+                energy=energy,
+                runname=runname,
+                inputFile="",
+                nproc=nproc,
+                procnum=procnum,
+                runID=runID,
+                doFiltering=self.doFiltering,
+                mcprescale=1,
+                mctype="CORSIKA",
+                return_name=True,
+            )
             exeFile, LV1File = self.detectorSim.run_lv1(
                 energy=energy,
                 runname=runname,
@@ -358,6 +370,13 @@ class ProcessRunner:
                 self.executeFile(key=f"{energy}_{runname}_lv2", exeFile=exeFile)
         #################################### LV3 ###########################################
         if self.extraOptions.get("doLV3"):
+            LV2File = self.detectorSim.run_lv2(
+                energy=energy,
+                runname=runname,
+                LV1File="",
+                extraOptions=self.extraOptions.get("lv2"),
+                return_name=True,
+            )
             exeFile, LV3File = self.detectorSim.run_lv3(
                 energy=energy,
                 runname=runname,
