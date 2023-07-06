@@ -51,15 +51,15 @@ class SubFilesGenerator:
         # specify runtime according to theta
         # larger theta require more runtime
         if theta >= 65:
-            runtime = "06:00:00"
-        elif theta >= 75:
-            runtime = "08:00:00"
-        elif theta >= 77.5:
             runtime = "10:00:00"
+        elif theta >= 75:
+            runtime = "12:00:00"
+        elif theta >= 77.5:
+            runtime = "16:00:00"
         elif theta >= 80:
             runtime = "30:00:00"
         else:
-            runtime = "05:00:00"
+            runtime = "08:00:00"
 
 
         # Opening and writing in the file 
@@ -68,8 +68,8 @@ class SubFilesGenerator:
             file.write(""
                 + f"#!/bin/bash\n"
                 + f"#SBATCH --job-name={self.runNumber}\n" # job name is the run number
-                + f"#SBATCH --output=/home/hk-project-radiohfi/bg5912/work/sims/GRAND/june/logs/_log%j.out\n"
-                + f"#SBATCH --error=/home/hk-project-radiohfi/bg5912/work/sims/GRAND/june/logs/_log%j.err\n"
+                + f"#SBATCH --output=/home/hk-project-radiohfi/bg5912/work/sims/GRAND/lukas/logs/_log%j.out\n"
+                + f"#SBATCH --error=/home/hk-project-radiohfi/bg5912/work/sims/GRAND/lukas/logs/_log%j.err\n"
                 + f"#SBATCH --nodes=2\n"
                 + f"#SBATCH --cpus-per-task=12\n"
                 + f"#SBATCH --tasks=2\n"
