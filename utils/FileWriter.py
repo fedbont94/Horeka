@@ -88,6 +88,7 @@ class FileWriter:
         seed6 = seed1 + 5
 
         thin1 = 1.000E-06
+        par = 1E-3
 
         # TODO: zenith and azimuth need to be chosen at random
 
@@ -108,14 +109,14 @@ class FileWriter:
                 + f"ERANGE  {en1:.11E}    {en1:.11E}\n"  # in GeV
                 + f"THETAP  {self.zenith}    {self.zenith}\n"  
                 + f"PHIP    {self.azimuth} {self.azimuth}\n"  
-                + f"ECUTS   0.500E+00 0.500E+00 3.000E-03 3.000E-03\n"
-                + f"PARALLEL 1E3 1E5 1 F\n" #1E3 1E5 1 F #1E0 1E3
+                + f"ECUTS   3.0E-01 1.0E-02 2.5E-04 2.5E-04\n"
+                + f"PARALLEL 1E3 {par * en1:.11E} 1 F\n" # ECTMAX like Felix did
                 + f"ELMFLG  T    T\n"   # Disable NKG since it gets deactivated anyway when CURVED is selected at corsika setup
-                + f"THIN    {thin1} {thin1 * en1:.11E} 0.000000e+00\n" # ERANGE * THIN1 = THIN2 # {thin1} {thin1 * en1:.11E} 5.000000e+03\n
-                + f"THINH   1.000E+00 1.000E+00\n"#1.000E+02 1.000E+02
+                + f"THIN    {thin1} {thin1 * en1:.11E} 5.0E+03\n" # ERANGE * THIN1 = THIN2 # {thin1} {thin1 * en1:.11E} 5.000000e+03\n
+                + f"THINH   1.000E+00 1.000E+02\n"
                 + f"STEPFC  1.0\n"
                 + f"OBSLEV  {self.obslev}\n"  # 1549700 for Dunhuang?  # 1142.0E2 elevation Dunhuang (hopefully close enough to Xiaodushan, which I can't find)
-                + f"ECTMAP  1.E+15\n"#1.E+05
+                + f"ECTMAP  1.E+15\n"
                 + f"MUMULT  T\n"
                 + f"MUADDI  T\n"
                 + f"MAXPRT  1\n"
