@@ -17,18 +17,18 @@ $PYTHON $SCRIPT \
                 --username bg5912 \
                 --primary 14 \
                 --dataset 14000.0 \
-                --dirSimulations "/home/hk-project-radiohfi/bg5912/work/sims/GRAND/june/sim_storage/" \
+                --dirSimulations "/home/hk-project-radiohfi/bg5912/work/sims/GRAND/lukas/sim_storage/" \
                 --pathCorsika "/home/hk-project-radiohfi/bg5912/work/soft/corsika-77420/run/" \
                 --corsikaExe "/mpi_corsika77420Linux_SIBYLL_urqmd_thin_coreas_parallel_runner" \
                 --startNumber 0 \
                 --endNumber 10 \
-                --energyStart 10.0 \
-                --energyEnd 10.9 \
+                --energyStart 8.0 \
+                --energyEnd 9.0 \
                 --energyStep 0.1 \
-                --azimuth 0.00000000 \
+                --azimuth 38.00000000 \
                 --zenith 65.00000000 \
-                --obslev 1200 \
-                --logDirProcesses "/home/hk-project-radiohfi/bg5912/work/sims/GRAND/june/logs/" \
+                --obslev 120000 \
+                --logDirProcesses "/home/hk-project-radiohfi/bg5912/work/sims/GRAND/lukas/logs/" \
                 --parallelSim 1
 
 # "/lsdf/kit/ikp/projects/IceCube/sim/gamma-sim/" \
