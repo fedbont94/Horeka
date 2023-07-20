@@ -55,7 +55,8 @@ class runNumberGenerator:
         
         self.azimuthDict = {
                              0.0  : 0,
-                             45.0 : 1,
+                            #  45.0 : 1,
+                             38.0 : 1,
                              90.0 : 2,
                              135.0: 3,
                              180.0: 4,
