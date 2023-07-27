@@ -115,14 +115,8 @@ class SimulationMaker:
             f.write(r"#!/bin/sh") # This shows that the file is an executable
             f.write(
                 f"\n"
-                # You must delete corsika non completed files. Otherwise returns an error and exits without executing the file 
-                # + f"\nrm {self.fW.directories['inp']}/{log10_E}/DAT{runNumber}" # Removes the non-completed simulation file if already existing
-                # + f"\nrm {self.fW.directories['inp']}/{log10_E}/DAT{runNumber}.long" # Removes the non-completed long file if already existing
-                # + f"\nrm {logFile}" # Removes the non-completed log file if already existing
-                # # remove old radio files created by corsika
-                # + f"\nrm -r {self.fW.directories['inp']}/{log10_E}/SIM{runNumber}_coreas"
-                # + f"\nrm {self.fW.directories['inp']}/{log10_E}/SIM{runNumber}_coreas.bins"
                 + f"\nrm -r {self.fW.directories['data']}" # not used in radio
+                + f"\n sbatch -p cpuonly -A hk-project-radiohfi --job-name={runNumber} ./submit_jobs.sh"
                 + f"\n"
             )
 
