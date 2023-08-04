@@ -69,7 +69,7 @@ class RadioFilesGenerator:
                 + f"CoreCoordinateVertical = {self.obslev}      ; in cm\n"
                 + f"# parameters setting up the temporal observer configuration:\n"
                 + f"TimeResolution = 2e-10                ; in s\n"
-                + f"AutomaticTimeBoundaries = 1e-06            ; 0: off, x: automatic boundaries with width x in s\n"
+                + f"AutomaticTimeBoundaries = 1e-07            ; 0: off, x: automatic boundaries with width x in s\n"
                 + f"TimeLowerBoundary = -1                ; in s, only if AutomaticTimeBoundaries set to 0\n"
                 + f"TimeUpperBoundary = 1                ; in s, only if AutomaticTimeBoundaries set to 0\n"
                 + f"ResolutionReductionScale = 0            ; 0: off, x: decrease time resolution linearly every x cm in radius\n"
@@ -121,7 +121,6 @@ class RadioFilesGenerator:
 
 
 
-
     def get_starshapes(self):
         """
         get starshape positions from starshapes.list
@@ -151,8 +150,8 @@ class RadioFilesGenerator:
         # Opening and writing in the file
         with open(list_name, 'w') as f:
             # write the positions (x, y, z) and names of the detector's antennas to the .list file
-            for i in range(self.antennaInfo["x"].shape[0]):
-                f.write(f"AntennaPosition = {self.antennaInfo['x'][i]} {self.antennaInfo['y'][i]} {self.antennaInfo['z'][i]} {self.antennaInfo['name'][i]}\n") 
+            # for i in range(self.antennaInfo["x"].shape[0]):
+            #     f.write(f"AntennaPosition = {self.antennaInfo['x'][i]} {self.antennaInfo['y'][i]} {self.antennaInfo['z'][i]} {self.antennaInfo['name'][i]}\n") 
             # write the positions (x, y, z) and names of the starshape antennas to the .list file
             for i in range(self.starshapeInfo["x"].shape[0]):
                 f.write(f"AntennaPosition = {self.starshapeInfo['x'][i]} {self.starshapeInfo['y'][i]} {self.starshapeInfo['z'][i]} {self.starshapeInfo['name'][i]}\n") 

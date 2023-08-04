@@ -66,16 +66,26 @@ class SubFilesGenerator:
         with open(sub_file, "w") as file:
             ######Things that go into the sub file for Horeka#######
             file.write(""
-                + f"#!/bin/bash\n"
-                + f"#SBATCH --job-name={self.runNumber}\n" # job name is the run number
+                + f"#!/bin/bash" 
+                + f"#SBATCH --job-name={self.runNumber}\n"
                 + f"#SBATCH --output=/home/hk-project-radiohfi/bg5912/work/sims/GRAND/lukas/logs/_log%j.out\n"
                 + f"#SBATCH --error=/home/hk-project-radiohfi/bg5912/work/sims/GRAND/lukas/logs/_log%j.err\n"
-                + f"#SBATCH --nodes=2\n"
-                + f"#SBATCH --cpus-per-task=12\n"
-                + f"#SBATCH --tasks=2\n"
-                + f"#SBATCH --time={runtime}\n"
+                + f"#SBATCH --nodes=1\n"
+                + f"#SBATCH --ntasks-per-node=76\n"
+                + f"#SBATCH --cpus-per-task=1\n"
+                + f"#SBATCH --time=2-00:00:00\n" #{self.runtime}
                 + f"\n"
-                + f"\nmpirun --bind-to core:overload-allowed --map-by core -report-bindings {self.pathCorsika}/{self.corsikaExe} {inpFile} > {logFile}" # run corsika 
+                + f"# Load MPI module (if necessary)\n"
+                + f"# module load mpi\n"
+                + f"# Set the path to your MPI-Corsika executable\n"
+                + f"MPI_CORSIKA_EXEC='{self.pathCorsika}/{self.corsikaExe}'\n"
+                + f"\n"
+                + f"# Set the path to your input and output files\n"
+                + f"INPUT_FILE='{inpFile}'\n"
+                + f"LOG_FILE='{logFile}'\n"
+                + f"\n"
+                + f"# Run the MPI-Corsika executable\n"
+                + f"mpirun --bind-to core:overload-allowed --map-by core -report-bindings -np $SLURM_NTASKS $MPI_CORSIKA_EXEC $INPUT_FILE > $LOG_FILE\n"
             )
 
         # Make the file executable
