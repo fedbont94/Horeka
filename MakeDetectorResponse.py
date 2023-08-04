@@ -8,220 +8,23 @@ The args values can be used to specify the desired configuration for the simulat
 
 How to run:
     python3 MakeDetectResponse.py 
- if you want to change any configuration from the default once add the [args] after it
- e.g.:
+if you want to change any configuration from the default once add the [args] after it
+e.g.:
     python3 MakeDetectResponse.py -inDirectory /path/to/folder -outDirectory /path/to/folder ..... 
 
 @author: Federico Bontempo <federico.bontempo@kit.edu> PhD student KIT Germany
 @date: October 2022
 """
 
-import os
+
 import numpy as np
 
 from utils.Submitter import Submitter
 from utils.MultiProcesses import MultiProcesses
 from utils.DetectorSimulator import DetectorSimulator
+from utils.ProcessRunner import ProcessRunner
 
-
-def make_parser():
-    """
-    Makes all the arguments that are required for the following script
-    """
-    import argparse
-
-    parser = argparse.ArgumentParser(
-        description="Inputs for the Detector Response Maker"
-    )
-    ############################## Directories paths ####################################
-    parser.add_argument(
-        "-inDirectory",
-        type=str,
-        default="/lsdf/kit/ikp/projects/IceCube/sim/gamma-sim/data/",
-        help="Directory where the simulation are stored. Please give the data folder. \
-            This script assumes that in this folder there are subdirectories with energy number",
-    )
-    parser.add_argument(
-        "-outDirectory",
-        type=str,
-        default="/lsdf/kit/ikp/projects/IceCube/sim/gamma-sim/",
-        help="Directory where the detector response  has to be stored. \
-            It will create here a new folder: 'detector_response'.\
-            Output folder name. The output file(s) will be <output>/generates/(topsimulator|detector)/[TopSimulator|Detector]_DETECTOR_corsika_icetop.MCDATASET.RUN.i3.bz2 \
-            for level 0s, <output>/filtered/Level[1|2]_DETECTOR_corsika_icetop.MCDATASET.RUN.i3.bz2, for level 1 and 2, Level3_DETECTOR_DATASET_Run.RUN.i3.bz2 for level3 \
-            The condor files will be saved in the realtive condor folders",
-    )
-    ############################# General Requirement #####################################
-    parser.add_argument(
-        "-pythonPath",
-        type=str,
-        default="/usr/bin/python3",
-        help="Python path which runs the simulations of detector response",
-    )
-    parser.add_argument(
-        "-i3build",
-        type=str,
-        default="/home/hk-project-pevradio/rn8463/icetray/build/",
-        help="The path to the build directory of icetray environment",
-    )
-    parser.add_argument(
-        "-detector",
-        type=str,
-        default="IC86",
-        help="Detector type/geometry (IC79, IC86, IC86.2012...): the full name will be used only for L3 reconstruction,\
-            while for the other only the base (i.e. IC86 if declared IC86.2012) [default: IC86]",
-    )
-    parser.add_argument(
-        "-GCD",
-        type=str,
-        default="/lsdf/kit/ikp/projects/IceCube/sim/GCD/GeoCalibDetectorStatus_2012.56063_V1_OctSnow.i3.gz",
-        help="path where the GCD lv2 file is located",
-    )
-    parser.add_argument(
-        "-year",
-        type=str,
-        default="2012",
-        help="Detector year it will be used for the full detector name in the L3 reconstruction.",
-    )
-    parser.add_argument(
-        "-MCdataset",
-        type=int,
-        default=13400,
-        help="Number of corsika dataset [default: 13410]",
-    )
-    parser.add_argument(
-        "-dataset", type=int, default=12012, help="Number of dataset [default: 12012]"
-    )
-    parser.add_argument(
-        "-seed",
-        type=int,
-        default=120120000,
-        help="The seed is the base seed which is 100_000 times the given dataset number",
-    )
-    ############################## Energy ####################################
-    parser.add_argument(
-        "-energyStart", type=float, default=5.0, help="Lower limit of energy"
-    )
-    parser.add_argument(
-        "-energyEnd", type=float, default=7.0, help="Upper limit of energy"
-    )
-    parser.add_argument(
-        "-energyStep",
-        type=float,
-        default=0.1,
-        help="Step in energy, 0.1 default (do not change unless you know what you are doing)",
-    )
-    ############################# Parallelization #####################################
-    parser.add_argument(
-        "-logDirProcesses",
-        type=str,
-        default="/home/hk-project-pevradio/rn8463/logDetResponse/",
-        help="Directory where log files of the multiple subProcesses are stored",
-    )
-    parser.add_argument(
-        "-parallelSim",
-        type=int,
-        default=100,
-        help="Number of parallel simulation processes",
-    )
-    ##################################################################
-    parser.add_argument(
-        "--NumbSamples",
-        type=int,
-        default=100,
-        help="How many samples per run will be simulated by icetopshowergenerator.py [default: 100]",
-    )
-    return parser.parse_args()
-
-
-def generatorFake():
-    """
-    This is a fake generator that is used to in the submitter class to run the simulation in a single process.
-    """
-    yield None, None
-
-
-class ProcessRunner:
-    """
-    This class is used to run the simulations and call the shell scripts.
-    -----------------------------------------------------------------------
-    Parameters:
-        detectorSim: the detector simulation class
-        submitter: the submitter class
-        energies: the energy range that will be simulated
-        inDirectory: the directory where the data corsika files are located
-        doFiltering: if True, the data will be filtered with the lv3 trigger filtering
-        extraOptions: a dictionary with the extra options that will be passed to the submitter class # TODO: check if this is needed
-    """
-
-    def __init__(
-        self,
-        detectorSim,
-        submitter,
-        energies,
-        inDirectory,
-    ):
-        self.detectorSim = detectorSim
-        self.submitter = submitter
-        self.energies = energies
-        self.inDirectory = inDirectory
-
-    def generatorKeys(self):
-        """
-        This generator is used to generate the keys for the submitter class.
-
-        nproc is the number of input files you give (e.g. I have 667 in each energy bin folder)
-        runid is the number of the corsika shower
-        runname is in principle the same as runid but with leading zeros and as a string which is then used for file naming
-        procnum is the index of the run in the set of given inputs, so the first run that will be processed has procnum 1, no matter what the runid is, the last is my example would be 667
-
-        some of the scripts (like icetopshowergenerator) take the base seed, nproc and proxcnum and calculate the actual used seed by combining those three numbers
-        """
-        # loop over all energies and yield the key and the arguments for the run_processes function
-        for energy in self.energies:
-            inDir = f"{self.inDirectory}/{energy}/"
-            # list all files in the directory and sort them
-            fileList = sorted(
-                [f for f in os.listdir(inDir) if os.path.isfile(os.path.join(inDir, f))]
-            )
-            # nproc is the number of files simulated per energy bin obtained by listing all files in the direcory and getting the len of it
-            nproc = len(fileList)
-            # loop over all files in the directory
-            for index, corsikaFile in enumerate(fileList):
-                if corsikaFile.endswith(".bz2"):
-                    continue
-                runID = int(corsikaFile.partition("DAT")[-1][-5:])
-                runname = str(corsikaFile.partition("DAT")[-1])
-                procnum = index + 1
-                keyArgs = [energy, inDir + corsikaFile, runname, runID]
-                yield (f"{energy}_{runname}", keyArgs)
-
-    def run_processes(self, energy, corsikaFile, runname, runID):
-        """
-        This functions can be edited and can be used for running all processes needed that can ebe found in DetectorSimulator
-        If your function is not available, add it to the class and run it here.
-        """
-        ##################################### ITExDefault ##########################################
-        exeFile, ITExFile = self.detectorSim.run_simITExDefault(
-            energy=energy,
-            runname=runname,
-            inputFile=corsikaFile,
-            runID=runID,
-        )
-        if exeFile is not None:
-            print(energy, runname, "run_simITExDefault")
-            self.executeFile(key=f"{energy}_{runname}_ITEx", exeFile=exeFile)
-
-        return
-
-    def executeFile(self, key, exeFile):
-        """
-        This function executes the sh file that was created by the DetectorSimulator class.
-        And comminicates with the file has completed so that the log and the err file can be created and the new process can be started.
-        """
-        self.submitter.startSingleProcess(key, exeFile)
-        self.submitter.communicateSingleProcess(key)
-        return
+from utils.utilsFunctions import generatorFake, make_parser
 
 
 def mainLoop(args):
@@ -239,15 +42,12 @@ def mainLoop(args):
     """
 
     # Define the energies that are going to be simulated.
-    energies = np.around(  # Need to round the numpy array otherwise the floating is wrong
-        np.arange(
-            args.energyStart,  # energy starting point
-            args.energyEnd
-            + args.energyStep,  # energy end point plus one step in order to include last step
-            args.energyStep,  # step in energies
-        ),
-        decimals=1,  # the rounding has to have one single decimal point for the folder.
-    )
+    energies = np.linspace(
+        args.energyStart,  # energy starting point
+        args.energyEnd,  # energy end point
+        int((args.energyEnd - args.energyStart) / args.energyStep)
+        + 1,  # number of energies +1 because of the linspace
+    ).round(1)
 
     # The class that creates all the sh files with the python scripts that are needed to run the simulation.
     detectorSim = DetectorSimulator(

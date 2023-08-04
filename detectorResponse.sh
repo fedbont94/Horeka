@@ -3,19 +3,19 @@
 source /home/hk-project-pevradio/rn8463/.bashrc
 
 # This is used for the generated folders file. So all the detector ones and in-ice
-environment1="/cvmfs/icecube.opensciencegrid.org/py3-v4.2.1/icetray-env /home/hk-project-pevradio/rn8463/icetray/build/"
+# environment1="/cvmfs/icecube.opensciencegrid.org/py3-v4.2.1/icetray-env /home/hk-project-pevradio/rn8463/icetray/build/"
 # This is used for the filtered folders file. So all the lv1, lv2
-environment2="/cvmfs/icecube.opensciencegrid.org/py3-v4.1.1/icetray-env combo/V01-01-06"
+# environment2="/cvmfs/icecube.opensciencegrid.org/py3-v4.1.1/icetray-env combo/V01-01-06"
 # Lv3 enviroment 
 environment3="/home/hk-project-pevradio/rn8463/icetray/surfacearray/build/env-shell.sh"
 
 # Python and script
-PYTHON=/cvmfs/icecube.opensciencegrid.org/py3-v4.1.1/RHEL_7_x86_64/bin/python3
+PYTHON=/cvmfs/icecube.opensciencegrid.org/py3-v4.2.1/RHEL_7_x86_64/bin/python3
 SCRIPT=/home/hk-project-pevradio/rn8463/simulations_scripts/MakeDetectorResponse.py
 
 # Fixed parameters
 inDirectory="/hkfs/work/workspace/scratch/rn8463-gammaCorsikaTankScint/data/"
-outDirectory="/hkfs/work/workspace/scratch/rn8463-gammaDetectorTankScint"
+outDirectory="/hkfs/work/workspace/scratch/rn8463-gammaDetectorTankScint/"
 i3build="/home/hk-project-pevradio/rn8463/icetray/surfacearray/build/"
 detector="IC86"
 GCD="/home/hk-project-pevradio/rn8463/GCD/GCD_Base2021.Run135903.T00S1.Pass2_V1b_Snow2025_6ScintSTA.i3.bz2"
@@ -28,14 +28,15 @@ NumbSamples=100
 
 #################################### TODO ####################################
 # Energy range for the detector response
-energyStart=4.0
-energyEnd=4.1
+energyStart=6.8
+energyEnd=6.9
 
 # Parallelization
-parallelSim=1
-logDirProcesses="/home/hk-project-pevradio/rn8463/log/logTest/"
+parallelSim=100
+logDirProcesses="/home/hk-project-pevradio/rn8463/log/logDetResponseTankScint/"
 #################################### TODO ####################################
 
+eval `/cvmfs/icecube.opensciencegrid.org/py3-v4.2.0/setup.sh`
 ############### Generated #####################
 $environment3 $PYTHON $SCRIPT \
                 -inDirectory $inDirectory \
