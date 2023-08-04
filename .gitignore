@@ -1,0 +1,19 @@
+# Ignore shared libraries
+*.so
+
+# Ignore Python bytecode
+__pycache__
+*.pyc
+*.pyo
+*.root
+
+# jupyterlab checkpoints
+.ipynb_checkpoints
+
+# Ignore PyCharm stuff
+.idea
+
+# mac 
+.DS_Store
+
+*.pyc
