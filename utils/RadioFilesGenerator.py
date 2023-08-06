@@ -13,6 +13,7 @@ the detector antennas are moved at random for each run.
 
 import numpy as np
 import random
+from miniradiotools.starshapes import create_stshp_list
 
 class RadioFilesGenerator:
 
@@ -23,6 +24,8 @@ class RadioFilesGenerator:
         log10_E1,
         pathStarshapes,             # the path to the starshapes.list file
         pathAntennas,               # the path to the antennas.list file (the detector antennas)
+        zenith,
+        azimuth,
 
     ):
         self.directory = directory
@@ -31,6 +34,8 @@ class RadioFilesGenerator:
         self.log10_E1 = log10_E1
         self.pathStarshapes = pathStarshapes
         self.pathAntennas = pathAntennas
+        self.zenith = zenith
+        self.azimuth = azimuth
         self.antennaInfo = {}
         self.starshapeInfo = {}
 
@@ -128,6 +133,15 @@ class RadioFilesGenerator:
 
         """
 
+        create_stshp_list(self.zenith, self.azimuth, filename="SIM{self.runNumber}.list", 
+                        obslevel=156400.0, # for Dunhuang, in cm for corsika
+                        obsplane = "showerplane",
+                        inclination=np.deg2rad(61.60523), # for Dunhuang
+                        Rmin=0., Rmax=500., n_rings=20, # for positions in starshape
+                        arm_orientations=np.deg2rad([0, 45, 90, 135, 180, 225, 270, 315]), # for positions in starshape
+                        vxB_plot=False
+                        )
+
         file = np.genfromtxt(self.pathStarshapes, dtype = "str")
         # get antenna positions from file
         # file[:,0] and file[:,1] are useless (they are simply "AntennaPosition" and "=")
@@ -149,12 +163,12 @@ class RadioFilesGenerator:
         
         # Opening and writing in the file
         with open(list_name, 'w') as f:
-            # write the positions (x, y, z) and names of the detector's antennas to the .list file
-            # for i in range(self.antennaInfo["x"].shape[0]):
-            #     f.write(f"AntennaPosition = {self.antennaInfo['x'][i]} {self.antennaInfo['y'][i]} {self.antennaInfo['z'][i]} {self.antennaInfo['name'][i]}\n") 
             # write the positions (x, y, z) and names of the starshape antennas to the .list file
             for i in range(self.starshapeInfo["x"].shape[0]):
                 f.write(f"AntennaPosition = {self.starshapeInfo['x'][i]} {self.starshapeInfo['y'][i]} {self.starshapeInfo['z'][i]} {self.starshapeInfo['name'][i]}\n") 
+            # write the positions (x, y, z) and names of the detector's antennas to the .list file
+            # for i in range(self.antennaInfo["x"].shape[0]):
+            #     f.write(f"AntennaPosition = {self.antennaInfo['x'][i]} {self.antennaInfo['y'][i]} {self.antennaInfo['z'][i]} {self.antennaInfo['name'][i]}\n") 
             
 
     def writeReasList(self):

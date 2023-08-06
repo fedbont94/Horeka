@@ -139,6 +139,8 @@ class FileWriter:
             log10_E1 = log10_E1,
             pathStarshapes = self.pathStarshapes,
             pathAntennas = self.pathAntennas,
+            zenith = self.zenith,
+            azimuth = self.azimuth,
         )
 
         RadGen.writeReasList()
