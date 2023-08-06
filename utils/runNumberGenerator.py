@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# author: Jelena
+
 import numpy as np
 
 """
@@ -53,6 +55,7 @@ class runNumberGenerator:
                              85.0 : 8,
                                     }
         
+        # TODO: fix this mess
         self.azimuthDict = {
                              0.0  : 0,
                             #  45.0 : 1,
