@@ -133,16 +133,20 @@ class RadioFilesGenerator:
 
         """
 
-        create_stshp_list(self.zenith, self.azimuth, filename=self.directory + "SIM{self.runNumber}.list", 
-                        obslevel=self.obslev, # for Dunhuang, in cm for corsika
-                        obsplane = "showerplane",
+        create_stshp_list(self.zenith, self.azimuth, filename=f"{self.directory}/SIM{self.runNumber}.list", 
+                        obslevel=int(self.obslev), # for Dunhuang, in cm for corsika
+                        obsplane = "groundplane",
                         inclination=np.deg2rad(61.60523), # for Dunhuang
-                        Rmin=0., Rmax=500., n_rings=20, # for positions in starshape
+                        Rmin=0., Rmax=50000., n_rings=20, # for positions in starshape
                         arm_orientations=np.deg2rad([0, 45, 90, 135, 180, 225, 270, 315]), # for positions in starshape
                         vxB_plot=False
                         )
 
-        file = np.genfromtxt(self.directory + "SIM{self.runNumber}.list", dtype = "str")
+        file = np.genfromtxt(f"{self.directory}/SIM{self.runNumber}.list", dtype = "str")
+        print(file)
+        print("zen=", self.zenith)
+        print("az", self.azimuth)
+        print("obslev", self.obslev)
         # get antenna positions from file
         # file[:,0] and file[:,1] are useless (they are simply "AntennaPosition" and "=")
         # get the x and y positions
