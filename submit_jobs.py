@@ -7,7 +7,7 @@ import subprocess
 import time
 import glob
 
-directory = '/home/hk-project-radiohfi/bg5912/work/sims/GRAND/june/sim_storage/inp/'  # Replace with the desired directory path
+directory = '/home/hk-project-radiohfi/bg5912/work/sims/GRAND/lukas/sim_storage/inp/'  # Replace with the desired directory path
 sub_files = glob.glob(directory + '/**/*.sub', recursive=True)
 
 while True:
