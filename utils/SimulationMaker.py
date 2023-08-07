@@ -96,7 +96,7 @@ class SimulationMaker:
                     # It writes the Corsika input file 
                     self.fW.writeFile(runNumber, log10_E1, log10_E2)
                     # The unique key for the the Submitter is created as followed. 
-                    # It has not practical use, nut MUST be unique 
+                    # It has not practical use, but MUST be unique 
                     key = f"{log10_E1}_{runNumber}"
                     # It calls the function to create a sting which will be used for the job execution
                     stringToSubmit = self.makeStringToSubmit(log10_E1, runNumber)
@@ -116,7 +116,7 @@ class SimulationMaker:
             f.write(
                 f"\n"
                 + f"\nrm -r {self.fW.directories['data']}" # not used in radio
-                + f"\n sbatch -p cpuonly -A hk-project-radiohfi --job-name={runNumber} ./submit_jobs.sh"
+                + f"\n sbatch -p cpuonly -A hk-project-radiohfi --job-name={runNumber} .{self.fW.directories['inp']}/{log10_E}/SIM{runNumber}.sub"
                 + f"\n"
             )
 
