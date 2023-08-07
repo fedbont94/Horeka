@@ -116,7 +116,7 @@ class SimulationMaker:
             f.write(
                 f"\n"
                 + f"\nrm -r {self.fW.directories['data']}" # not used in radio
-                + f"\n sbatch -p cpuonly -A hk-project-radiohfi --job-name={runNumber} .{self.fW.directories['inp']}/{log10_E}/SIM{runNumber}.sub"
+                + f"\n sbatch -p cpuonly -A hk-project-radiohfi --job-name={runNumber} {self.fW.directories['inp']}/{log10_E}/SIM{runNumber}.sub"
                 + f"\n"
             )
 
