@@ -135,7 +135,7 @@ class RadioFilesGenerator:
 
         create_stshp_list(self.zenith, self.azimuth, filename=f"{self.directory}/SIM{self.runNumber}.list", 
                         obslevel=int(self.obslev), # for Dunhuang, in cm for corsika
-                        obsplane = "gp",
+                        obsplane = "sp",
                         inclination=np.deg2rad(61.60523), # for Dunhuang
                         Rmin=0., Rmax=50000., n_rings=20, # for positions in starshape
                         arm_orientations=np.deg2rad([0, 45, 90, 135, 180, 225, 270, 315]), # for positions in starshape
