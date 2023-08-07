@@ -143,10 +143,7 @@ class RadioFilesGenerator:
                         )
 
         file = np.genfromtxt(f"{self.directory}/SIM{self.runNumber}.list", dtype = "str")
-        print(file)
-        print("zen=", self.zenith)
-        print("az", self.azimuth)
-        print("obslev", self.obslev)
+        
         # get antenna positions from file
         # file[:,0] and file[:,1] are useless (they are simply "AntennaPosition" and "=")
         # get the x and y positions
