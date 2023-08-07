@@ -27,7 +27,7 @@ $PYTHON $SCRIPT \
                 --energyStep 0.1 \
                 --azimuth 38.00000000 \
                 --zenith 65.00000000 \
-                --obslev 120000 \
+                --obslev 156400 \
                 --logDirProcesses "/home/hk-project-radiohfi/bg5912/work/sims/GRAND/lukas/logs/" \
                 --parallelSim 1
 
