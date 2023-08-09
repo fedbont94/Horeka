@@ -47,7 +47,15 @@ class SubFilesGenerator:
         inpFile = f"{self.inpdir}/{self.log10_E1}/{sim}.inp" # input file
         logFile = f"{self.logdir}/{self.log10_E1}/{dat}.log" # log file
 
-        # find theta
+
+        # directory containing the simulation files (input + output)
+        inpdir = f"{self.inpdir}/{self.log10_E1}/"
+        # create a directory to move all annoying files to after the sim is completed
+        datdir = f"{self.logdir}/{self.log10_E1}/{dat}/"
+
+
+
+        # get theta
         theta = self.zenith
 
         # specify runtime according to theta
@@ -88,8 +96,14 @@ class SubFilesGenerator:
                 + f"LOG_FILE='{logFile}'\n"
                 + f"\n"
                 + f"# Run the MPI-Corsika executable\n"
+                + f"echo starting job number {self.runNumber} complete\n"
+                + f"echo time: $(date)\n" # print current time
                 + f"mpirun --bind-to core:overload-allowed --map-by core -report-bindings -np $SLURM_NTASKS $MPI_CORSIKA_EXEC $INPUT_FILE > $LOG_FILE\n"
                 # $CORSIKA_EXEC < $INPUT_FILE > $LOG_FILE\n
+                + f"mkdir {datdir}\n" # create datdir directory
+                + f"mv -r {inpdir}* {datdir}\n" # move all annoying files to datdir
+                + f"echo job number {self.runNumber} complete\n"
+                + f"echo time: $(date)\n" # print current time
             )
 
         # Make the file executable
