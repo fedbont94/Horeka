@@ -81,6 +81,7 @@ class SubFilesGenerator:
                 + f"# module load mpi\n"
                 + f"# Set the path to your MPI-Corsika executable\n"
                 + f"MPI_CORSIKA_EXEC='{self.pathCorsika}/{self.corsikaExe}'\n"
+                # CORSIKA_EXEC='{self.pathCorsika}/{self.corsikaExe}'\n"
                 + f"\n"
                 + f"# Set the path to your input and output files\n"
                 + f"INPUT_FILE='{inpFile}'\n"
@@ -88,6 +89,7 @@ class SubFilesGenerator:
                 + f"\n"
                 + f"# Run the MPI-Corsika executable\n"
                 + f"mpirun --bind-to core:overload-allowed --map-by core -report-bindings -np $SLURM_NTASKS $MPI_CORSIKA_EXEC $INPUT_FILE > $LOG_FILE\n"
+                # $CORSIKA_EXEC < $INPUT_FILE > $LOG_FILE\n
             )
 
         # Make the file executable
