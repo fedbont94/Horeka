@@ -51,7 +51,7 @@ class SubFilesGenerator:
         # directory containing the simulation files (input + output)
         inpdir = f"{self.inpdir}/{self.log10_E1}/"
         # create a directory to move all annoying files to after the sim is completed
-        datdir = f"{self.logdir}/{self.log10_E1}/{dat}/"
+        datdir = f"{self.inpdir}/{self.log10_E1}/{dat}/"
 
 
 
@@ -99,9 +99,11 @@ class SubFilesGenerator:
                 + f"echo starting job number {self.runNumber} complete\n"
                 + f"echo time: $(date)\n" # print current time
                 + f"mpirun --bind-to core:overload-allowed --map-by core -report-bindings -np $SLURM_NTASKS $MPI_CORSIKA_EXEC $INPUT_FILE > $LOG_FILE\n"
-                # $CORSIKA_EXEC < $INPUT_FILE > $LOG_FILE\n
+                # $CORSIKA_EXEC < $INPUT_FILE > $LOG_FILE\n d
                 + f"mkdir {datdir}\n" # create datdir directory
-                + f"mv -r {inpdir}* {datdir}\n" # move all annoying files to datdir
+                + f"echo created {datdir}\n"
+                + f"mv {inpdir}/DAT??????-* {datdir}\n" # move all annoying files to datdir
+                + f"mv {inpdir}/corsika-timetable-* {datdir}\n"
                 + f"echo job number {self.runNumber} complete\n"
                 + f"echo time: $(date)\n" # print current time
             )
