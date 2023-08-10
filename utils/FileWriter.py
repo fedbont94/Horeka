@@ -53,12 +53,12 @@ class FileWriter:
         Parameters:
             log10_E1: the log10 of the Energy value for the subfolder creation        
         """
-        for folder in ["data", "temp", "log", "inp"]:
+        for folder in ["data", "temp", "log", "inp", "starshapes"]:
             self.directories[folder] = f"{self.directories['sim']}/{folder}/"
             # Creates the required directories in case they are not existing
             pathlib.Path(f"{self.directories[folder]}/{log10_E1}").mkdir(parents=True, exist_ok=True)
         return
-    
+    # TODO: get rid of data and temp
 
 
     def writeFile(self, runNumber, log10_E1, log10_E2):
