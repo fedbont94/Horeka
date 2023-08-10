@@ -100,6 +100,7 @@ class SubFilesGenerator:
                 + f"echo time: $(date)\n" # print current time
                 + f"mpirun --bind-to core:overload-allowed --map-by core -report-bindings -np $SLURM_NTASKS $MPI_CORSIKA_EXEC $INPUT_FILE > $LOG_FILE\n"
                 # $CORSIKA_EXEC < $INPUT_FILE > $LOG_FILE\n d
+                + f"rm {inpdir}/starshapes/\n"# remove the starshape files
                 + f"mkdir {datdir}\n" # create datdir directory
                 + f"echo created {datdir}\n"
                 + f"mv {inpdir}/DAT??????-* {datdir}\n" # move all annoying files to datdir

@@ -133,7 +133,7 @@ class RadioFilesGenerator:
 
         """
 
-        create_stshp_list(self.zenith, self.azimuth, filename=f"{self.directory}/SIM{self.runNumber}.list", 
+        create_stshp_list(self.zenith, self.azimuth, filename=f"{self.directory}/starshapes/SIM{self.runNumber}.list", 
                         obslevel=int(self.obslev), # for Dunhuang, in cm for corsika
                         obsplane = "sp",
                         inclination=np.deg2rad(61.60523), # for Dunhuang
@@ -142,7 +142,7 @@ class RadioFilesGenerator:
                         vxB_plot=False
                         )
 
-        file = np.genfromtxt(f"{self.directory}/SIM{self.runNumber}.list", dtype = "str")
+        file = np.genfromtxt(f"{self.directory}/starshapes/SIM{self.runNumber}.list", dtype = "str")
         
         # get antenna positions from file
         # file[:,0] and file[:,1] are useless (they are simply "AntennaPosition" and "=")
@@ -165,11 +165,11 @@ class RadioFilesGenerator:
         # Opening and writing in the file
         with open(list_name, 'w') as f:
             # write the positions (x, y, z) and names of the starshape antennas to the .list file
-            for i in range(self.starshapeInfo["x"].shape[0]):
-                f.write(f"AntennaPosition = {self.starshapeInfo['x'][i]} {self.starshapeInfo['y'][i]} {self.starshapeInfo['z'][i]} {self.starshapeInfo['name'][i]}\n") 
+            # for i in range(self.starshapeInfo["x"].shape[0]):
+            #     f.write(f"AntennaPosition = {self.starshapeInfo['x'][i]} {self.starshapeInfo['y'][i]} {self.starshapeInfo['z'][i]} {self.starshapeInfo['name'][i]}\n") 
             # write the positions (x, y, z) and names of the detector's antennas to the .list file
-            # for i in range(self.antennaInfo["x"].shape[0]):
-            #     f.write(f"AntennaPosition = {self.antennaInfo['x'][i]} {self.antennaInfo['y'][i]} {self.antennaInfo['z'][i]} {self.antennaInfo['name'][i]}\n") 
+            for i in range(self.antennaInfo["x"].shape[0]):
+                f.write(f"AntennaPosition = {self.antennaInfo['x'][i]} {self.antennaInfo['y'][i]} {self.antennaInfo['z'][i]} {self.antennaInfo['name'][i]}\n") 
             
 
     def writeReasList(self):
