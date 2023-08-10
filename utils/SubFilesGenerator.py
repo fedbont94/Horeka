@@ -100,13 +100,14 @@ class SubFilesGenerator:
                 + f"echo time: $(date)\n" # print current time
                 + f"mpirun --bind-to core:overload-allowed --map-by core -report-bindings -np $SLURM_NTASKS $MPI_CORSIKA_EXEC $INPUT_FILE > $LOG_FILE\n"
                 # $CORSIKA_EXEC < $INPUT_FILE > $LOG_FILE\n d
-                + f"rm {inpdir}/starshapes/\n"# remove the starshape files
+                + f"echo job number {self.runNumber} complete\n"
+                + f"echo time: $(date)\n" # print current time
                 + f"mkdir {datdir}\n" # create datdir directory
                 + f"echo created {datdir}\n"
                 + f"mv {inpdir}/DAT??????-* {datdir}\n" # move all annoying files to datdir
-                + f"mv {inpdir}/corsika-timetable-* {datdir}\n"
-                + f"echo job number {self.runNumber} complete\n"
-                + f"echo time: $(date)\n" # print current time
+                + f"mv {inpdir}/corsika_timetable-* {datdir}\n"
+                + f"rm -r {inpdir}/../data/ \n" # remove the data directory
+                + f"rm -r {inpdir}/../temp/ \n" # remove the obsolete temp directory
             )
 
         # Make the file executable
