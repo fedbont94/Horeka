@@ -14,12 +14,12 @@ PYTHON=/cvmfs/icecube.opensciencegrid.org/py3-v4.1.1/RHEL_7_x86_64/bin/python3
 SCRIPT=/home/hk-project-pevradio/rn8463/simulations_scripts/MakeDetectorResponse.py
 
 # Fixed parameters
-inDirectory="/hkfs/work/workspace/scratch/mk9399-corsika_sibyll23d/datasets/gamma_14000/data/"
-outDirectory="/hkfs/work/workspace/scratch/rn8463-gamma_simulations/detector_response/"
+inDirectory="/hkfs/work/workspace/scratch/rn8463-proton-corsika/"
+outDirectory="/hkfs/work/workspace/scratch/rn8463-proton_DetectorResponseITonly/2012/"
 detector="IC86"
 GCD="/cvmfs/icecube.opensciencegrid.org/data/GCD/GeoCalibDetectorStatus_2012.Run120844.T00S1.Pass2_V1b_Snow121021.i3.gz"
 year="2012"
-MCdataset=14000
+MCdataset=14001
 dataset=12012
 seed=1201200000
 energyStep=0.1
@@ -30,68 +30,72 @@ NumbFrames=0
 #################################### TODO ####################################
 # Energy range for the detector response
 energyStart=4.0
-energyEnd=6.4
+energyEnd=6.9
 
 # Parallelization
 parallelSim=100
-logDirProcesses="/home/hk-project-pevradio/rn8463/log/logDetResponseGammaExtra/"
+logDirProcesses="/home/hk-project-pevradio/rn8463/log/logDetProton/"
 #################################### TODO ####################################
 
-############### Generated #####################
-$environment1 $PYTHON $SCRIPT \
-                -inDirectory $inDirectory \
-                -outDirectory $outDirectory \
-                -pythonPath $PYTHON \
-                -detector $detector \
-                -GCD $GCD \
-                -year $year \
-                -MCdataset $MCdataset \
-                -dataset $dataset \
-                -seed $seed \
-                -energyStart $energyStart \
-                -energyEnd $energyEnd \
-                -energyStep $energyStep \
-                -logDirProcesses $logDirProcesses \
-                -parallelSim $parallelSim \
-                --photonDirectory $photonDirectory \
-                --NumbSamples $NumbSamples \
-                --NumbFrames $NumbFrames \
-                -doFiltering \
-                --doITSG \
-                --doDET 
+# partition=$(squeue -h -j ${SLURM_JOB_ID} -o "%P")
+# echo "Slurm partition: $partition"
 
-                # --doInIceBg \
+# if [ "$partition" = "accelerated" ] || [ "$partition" = "dev_accelerated" ]
+# then
+# ############### Generated #####################
+# $environment1 $PYTHON $SCRIPT \
+#                 -inDirectory $inDirectory \
+#                 -outDirectory $outDirectory \
+#                 -pythonPath $PYTHON \
+#                 -detector $detector \
+#                 -GCD $GCD \
+#                 -year $year \
+#                 -MCdataset $MCdataset \
+#                 -dataset $dataset \
+#                 -seed $seed \
+#                 -energyStart $energyStart \
+#                 -energyEnd $energyEnd \
+#                 -energyStep $energyStep \
+#                 -logDirProcesses $logDirProcesses \
+#                 -parallelSim $parallelSim \
+#                 --photonDirectory $photonDirectory \
+#                 --NumbSamples $NumbSamples \
+#                 --NumbFrames $NumbFrames \
+#                 -doFiltering \
+#                 --doDET 
+                # --doITSG \
                 # --doCLSIM \
 
+#                 # --doInIceBg \
+# cd /home/hk-project-pevradio/rn8463/simulations_scripts/
+# ./ExecuteSubFile.sh nothing
+# else
+# ############### Filtered Lv1 and Lv2 #####################
+# $environment2 $PYTHON $SCRIPT \
+#                 -inDirectory $inDirectory \
+#                 -outDirectory $outDirectory \
+#                 -pythonPath $PYTHON \
+#                 -detector $detector \
+#                 -GCD $GCD \
+#                 -year $year \
+#                 -MCdataset $MCdataset \
+#                 -dataset $dataset \
+#                 -seed $seed \
+#                 -energyStart $energyStart \
+#                 -energyEnd $energyEnd \
+#                 -energyStep $energyStep \
+#                 -logDirProcesses $logDirProcesses \
+#                 -parallelSim $parallelSim \
+#                 --photonDirectory $photonDirectory \
+#                 --NumbSamples $NumbSamples \
+#                 --NumbFrames $NumbFrames \
+#                 -doFiltering \
+#                 --doLV1 \
+#                 --doLV2 
 
-############### Filtered Lv1 and Lv2 #####################
-$environment2 $PYTHON $SCRIPT \
-                -inDirectory $inDirectory \
-                -outDirectory $outDirectory \
-                -pythonPath $PYTHON \
-                -detector $detector \
-                -GCD $GCD \
-                -year $year \
-                -MCdataset $MCdataset \
-                -dataset $dataset \
-                -seed $seed \
-                -energyStart $energyStart \
-                -energyEnd $energyEnd \
-                -energyStep $energyStep \
-                -logDirProcesses $logDirProcesses \
-                -parallelSim $parallelSim \
-                --photonDirectory $photonDirectory \
-                --NumbSamples $NumbSamples \
-                --NumbFrames $NumbFrames \
-                -doFiltering \
-                --doLV1 \
-                --doLV2 
 
-                # --doITSG \
-                # --doDET \
-
-
-# ############### Filtered Lv3 #####################
+# parallelSim=1 # This is for the lv3 if you want to run the in-ice response
+############### Filtered Lv3 #####################
 eval `/cvmfs/icecube.opensciencegrid.org/py3-v4.1.1/setup.sh`
 $environment3 $PYTHON $SCRIPT \
                 -inDirectory $inDirectory \
@@ -107,14 +111,10 @@ $environment3 $PYTHON $SCRIPT \
                 -energyEnd $energyEnd \
                 -energyStep $energyStep \
                 -logDirProcesses $logDirProcesses \
-                -parallelSim $parallelSim \
+                -parallelSim 30 \
                 --photonDirectory $photonDirectory \
                 --NumbSamples $NumbSamples \
                 --NumbFrames $NumbFrames \
                 -doFiltering \
                 --doLV3 
-                
-                # --doITSG \
-                # --doDET \
-                # --doLV1 \
-                # --doLV2 \
+# fi

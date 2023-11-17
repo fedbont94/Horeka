@@ -19,6 +19,8 @@ How to run:
 import os
 import numpy as np
 
+# import multiprocessing as mp
+
 from utils.Submitter import Submitter
 from utils.MultiProcesses import MultiProcesses
 from utils.DetectorSimulator import DetectorSimulator
@@ -234,6 +236,7 @@ class ProcessRunner:
 
         some of the scripts (like icetopshowergenerator) take the base seed, nproc and proxcnum and calculate the actual used seed by combining those three numbers
         """
+        # if self.extraOptions.get("doITSG"):
         # loop over all energies and yield the key and the arguments for the run_processes function
         for energy in self.energies:
             inDir = f"{self.inDirectory}/{energy}/"
@@ -246,12 +249,33 @@ class ProcessRunner:
             # loop over all files in the directory
             for index, corsikaFile in enumerate(fileList):
                 if corsikaFile.endswith(".bz2"):
+                    corsikaFile = corsikaFile[:-4]
+                elif corsikaFile.endswith(".log") or corsikaFile.endswith(".long"):
                     continue
                 runID = int(corsikaFile.partition("DAT")[-1][-5:])
                 runname = str(corsikaFile.partition("DAT")[-1])
                 procnum = index + 1
                 keyArgs = [energy, inDir + corsikaFile, runname, nproc, procnum, runID]
                 yield (f"{energy}_{runname}", keyArgs)
+        # elif self.extraOptions.get("doInIceBg"):
+        #     print("Not implemented yet")
+        # elif self.extraOptions.get("doCLSIM"):
+        #     for energy in self.energies:
+        #         inDir = f"{self.inDirectory}/{energy}/"
+        #         fileList = sorted(
+        #             [
+        #                 f
+        #                 for f in os.listdir(inDir)
+        #                 if os.path.isfile(os.path.join(inDir, f))
+        #             ]
+        #         )
+        #         nproc = len(fileList)
+        #         for index, clsimInp in enumerate(fileList):
+        #             runID = int(clsimInp.split(".i3")[0][2:])
+        #             runname = str(clsimInp.split(".i3")[0][2:])
+        #             procnum = index + 1
+        #             keyArgs = [energy, inDir + clsimInp, runname, nproc, procnum]
+        #             yield (f"{energy}_{runname}", keyArgs)
 
     def run_processes(self, energy, corsikaFile, runname, nproc, procnum, runID):
         """
@@ -262,8 +286,8 @@ class ProcessRunner:
         if self.extraOptions.get("doITSG"):
             exeFile, ITSGFile = self.detectorSim.run_ITShowerGenerator(
                 energy=energy,
-                runname=runname,
                 inputFile=corsikaFile,
+                runname=runname,
                 nproc=nproc,
                 procnum=procnum,
                 runID=runID,
@@ -271,9 +295,9 @@ class ProcessRunner:
             if exeFile is not None:
                 print(energy, runname, "run_ITShowerGenerator")
                 self.executeFile(key=f"{energy}_{runname}_ITSG", exeFile=exeFile)
-            inputFile = ITSGFile
+        ####################################### In Ice Background ############################################
         if self.extraOptions.get("doInIceBg"):
-            ####################################### corsika #################################################
+            ################### corsika ###################
             exeFile, corsikaBgFile = self.detectorSim.run_corsikaBg(
                 energy=energy,
                 runname=runname,
@@ -285,7 +309,7 @@ class ProcessRunner:
                 print(energy, runname, "run_CorsikaBg")
                 self.executeFile(key=f"{energy}_{runname}_CorsikaBg", exeFile=exeFile)
 
-            ####################################### polyplopia #############################################
+            ################### polyplopia ###################
             exeFile, polyplopiaFile = self.detectorSim.run_polyplopia(
                 energy=energy,
                 runname=runname,
@@ -304,11 +328,24 @@ class ProcessRunner:
             inputFile = polyplopiaFile
 
         if self.extraOptions.get("doCLSIM"):
+            if self.extraOptions.get("doInIceBg"):
+                inputFile = polyplopiaFile
+            else:
+                inputFile = self.detectorSim.run_ITShowerGenerator(
+                    energy=energy,
+                    inputFile=corsikaFile,
+                    runname=runname,
+                    nproc=nproc,
+                    procnum=procnum,
+                    runID=runID,
+                    return_name=True,
+                )
+
             ####################################### clsim ########################################
             exeFile, clsimFile = self.detectorSim.run_clsim(
                 energy=energy,
-                runname=runname,
                 inputFile=inputFile,
+                runname=runname,
                 nproc=nproc,
                 procnum=procnum,
                 oversize=5,
@@ -318,9 +355,31 @@ class ProcessRunner:
             if exeFile is not None:
                 print(energy, runname, "run_clsim")
                 self.executeFile(key=f"{energy}_{runname}_clsim", exeFile=exeFile)
-            inputFile = clsimFile
         ################################# detector ##############################################
         if self.extraOptions.get("doDET"):
+            if self.extraOptions.get("doCLSIM"):
+                inputFile = self.detectorSim.run_clsim(
+                    energy=energy,
+                    inputFile=inputFile,
+                    runname=runname,
+                    nproc=nproc,
+                    procnum=procnum,
+                    oversize=5,
+                    efficiency=1.0,
+                    icemodel="spice_3.2.1",
+                    return_name=True,
+                )
+            else:
+                inputFile = self.detectorSim.run_ITShowerGenerator(
+                    energy=energy,
+                    inputFile=corsikaFile,
+                    runname=runname,
+                    nproc=nproc,
+                    procnum=procnum,
+                    runID=runID,
+                    return_name=True,
+                )
+
             exeFile, DETFile = self.detectorSim.run_detector(
                 energy=energy,
                 runname=runname,
@@ -417,15 +476,12 @@ def mainLoop(args):
     """
 
     # Define the energies that are going to be simulated.
-    energies = np.around(  # Need to round the numpy array otherwise the floating is wrong
-        np.arange(
-            args.energyStart,  # energy starting point
-            args.energyEnd
-            + args.energyStep,  # energy end point plus one step in order to include last step
-            args.energyStep,  # step in energies
-        ),
-        decimals=1,  # the rounding has to have one single decimal point for the folder.
-    )
+    energies = np.linspace(
+        args.energyStart,  # energy starting point
+        args.energyEnd,  # energy end point
+        int((args.energyEnd - args.energyStart) / args.energyStep)
+        + 1,  # number of energies +1 because of the linspace
+    ).round(1)
 
     # The class that creates all the sh files with the python scripts that are needed to run the simulation.
     detectorSim = DetectorSimulator(
@@ -474,6 +530,17 @@ def mainLoop(args):
         functionToRun=processRun.run_processes,
         parallel_sim=args.parallelSim,
     )
+
+    # processes = []
+    # pool = mp.Pool(processes=args.parallelSim)
+    # while True:
+    #     key, argskey = processRun.generatorKeys()
+    #     script, args_, kwargs_ = processRun.run_processes()
+
+    #     try:
+    #         processes.append(pool.apply_async())
+    #     except StopIteration:
+    #         break
 
     # Start the processes in the multiProcessor class and check if they are finished.
     # This loops until all the processes are finished.

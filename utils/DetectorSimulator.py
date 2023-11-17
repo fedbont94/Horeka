@@ -5,6 +5,7 @@ Some documentation
 
 import os
 import pathlib
+import sys
 import stat
 
 
@@ -85,15 +86,22 @@ class DetectorSimulator:
         """
         fileToCheck = pathlib.Path(inputFile)
         if not fileToCheck.is_file():
-            import warnings
+            # import warnings
 
-            warnings.warn(
+            # warnings.warn(
+            #     f"\
+            #         \nThe program is not stopped, but be aware that: \
+            #         \n{inputFile} \
+            #         \n!!!!! DOES NOT EXIST !!!!!\
+            #         \n",
+            #     stacklevel=2,  # This is to show the line where the warning is raised and not repeated twice
+            # )
+            sys.exit(
                 f"\
                     \nThe program is not stopped, but be aware that: \
                     \n{inputFile} \
                     \n!!!!! DOES NOT EXIST !!!!!\
-                    \n",
-                stacklevel=2,  # This is to show the line where the warning is raised and not repeated twice
+                    \n"
             )
         return
 
@@ -175,7 +183,15 @@ class DetectorSimulator:
 
     ########################### Main simulation scipts ####################################
     def run_ITShowerGenerator(
-        self, energy, runname, inputFile, nproc, procnum, runID, extraOptions=""
+        self,
+        energy,
+        runname,
+        inputFile,
+        nproc,
+        procnum,
+        runID,
+        extraOptions="",
+        return_name=False,
     ):
         """
         Runs the icetopshowergenerator.py scripts with the default options
@@ -193,11 +209,17 @@ class DetectorSimulator:
         Return:
             exeFile: the file that need to be executed
         """
-        self.checkIfInputExists(inputFile)
         outputFolder = f"{self.outDirectory}/generated/topsimulator"
         outputFolder += (
             f"/TopSimulator_{self.detector}_corsika_icetop.{self.MCdataset}/"
         )
+        if return_name:
+            return f"{outputFolder}/data/{energy}/{runname}.i3.bz2"
+
+        fileToCheck = pathlib.Path(inputFile)
+        if not fileToCheck.is_file():
+            inputFile += ".bz2"
+        self.checkIfInputExists(inputFile)
 
         ITSGdataFile = (
             f"{outputFolder}/data/{energy}/{runname}.i3.bz2"  # Path and File name
@@ -421,6 +443,7 @@ class DetectorSimulator:
         oversize=5,
         efficiency=1.0,
         icemodel="spice_ftp-v1",  # "spice_3.2.1",
+        return_name=False,
     ):
         """
         Runs the clsim.py scripts with the default options
@@ -452,6 +475,9 @@ class DetectorSimulator:
         outputFolder = f"{self.outDirectory}/generated/clsim"
         outputFolder += f"/CLS_{self.detector}_corsika_icetop.{self.MCdataset}/"
 
+        if return_name:
+            return f"{outputFolder}/data/{energy}/{runname}.i3.bz2"
+
         CLSdataFile = (
             f"{outputFolder}/data/{energy}/{runname}.i3.bz2"  # Path and File name
         )
@@ -482,14 +508,33 @@ class DetectorSimulator:
             --holeiceparametrization {holeiceparametrization} \
             --efficiency {efficiency} \
             --procnum {procnum} \
+            --keep-pure-background \
+            --no-RunMPHitFilter \
             --inputfilelist {inputFile} \
             --outputfile {tempFile} > {logsFile}.out 2> {logsFile}.err \
             "
         # --runmphitfilter \
         # --PropagateMuons \
-        # --no-RunMPHitFilter \
-        # --keep-pure-background \
+        # --no-RunMPHitFilter \ # This is needed in case there is no polyplopia
         # TODO             --summaryfile \
+
+        # script = f"{self.i3build}/simprod-scripts/resources/scripts/clsim.py"
+        # args = ("UseGSLRNG", "UseGPUs", "keep-pure-background", "no-RunMPHitFilter")
+        # kwargs = {
+        #     "gcdfile": self.GCD,
+        #     "seed": self.seed,
+        #     "nproc": nproc,
+        #     "oversize": oversize,
+        #     "IceModel": icemodel,
+        #     "IceModelLocation": icemodellocation,
+        #     "holeiceparametrization": holeiceparametrization,
+        #     "efficiency": efficiency,
+        #     "procnum": procnum,
+        #     "inputfilelist": inputFile,
+        #     "outputfile": f"{tempFile} > {logsFile}.out 2> {logsFile}.err",
+        # }
+
+        # return script, args, kwargs
 
         if extraOptions:
             cmdOptions += extraOptions
@@ -792,6 +837,7 @@ class DetectorSimulator:
             --print-usage \
             --dataset {self.dataset} \
             --run {runID} \
+            --do-inice \
             -o {tempFile} > {logsFile}.out 2> {logsFile}.err \
             {self.GCD} {LV2File} \
             "
@@ -799,8 +845,6 @@ class DetectorSimulator:
         # --L2-gcdfile {self.GCD} \
         # --L3-gcdfile {self.Lv3GCD} \
         # --photonicsdir {self.photonDir} \
-        # --do-inice \
-
         if self.NumbFrames:
             cmdOptions += f"-n {self.NumbFrames} "
 
