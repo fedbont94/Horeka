@@ -208,7 +208,7 @@ class DetectorSimulator:
             -x -235 \
             -y 140 \
             -r {self.get_radius(energy)} \
-            --seed {self.seed} \
+            --seed {self.seed + int(energy*1e5) + int(runID)} \
             --run_id {runID} \
             {inputFile} \
             "

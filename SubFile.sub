@@ -1,24 +1,11 @@
 #!/bin/bash
-#SBATCH --job-name=PhotonDetectorResponse
+#SBATCH --job-name=ScintTank
 #SBATCH --output=/home/hk-project-pevradio/rn8463/log/logDetResponseTankScint/%j.out
 #SBATCH --error=/home/hk-project-pevradio/rn8463/log/logDetResponseTankScint/%j.err
 #SBATCH --nodes=1
 #SBATCH --time=3-00:00:00
 #SBATCH --mem=200gb
 #SBATCH --export=NONE
-########SBATCH --gres=gpu:4
-########SBATCH --container-image $HOME/osgvo-el7-cuda10.sif
-########SBATCH --container-mounts=/home/hk-project-pevradio/rn8463/cvmfsexec/dist/cvmfs:/cvmfs,/scratch,/etc/OpenCL,/hkfs/work/workspace/scratch/rn8463-gamma_simulations
 
-
-# $HOME/cvmfsexec/umountrepo icecube.opensciencegrid.org
-# $HOME/cvmfsexec/mountrepo icecube.opensciencegrid.org
-# #### export SINGULARITY_BIND="/home/hk-project-pevradio/rn8463/cvmfsexec/dist/cvmfs:/cvmfs,/scratch,/etc/OpenCL,/hkfs/work/workspace/scratch/rn8463-gamma_simulations" # TODO This can be commented out?
-# #### export APPTAINER_BIND="/home/hk-project-pevradio/rn8463/cvmfsexec/dist/cvmfs:/cvmfs,/scratch,/etc/OpenCL,/hkfs/work/workspace/scratch/rn8463-gamma_simulations"
-# export SINGULARITY_BIND="/home/hk-project-pevradio/rn8463/cvmfsexec/dist/cvmfs:/cvmfs,/scratch,/hkfs/work/workspace/scratch/rn8463-gamma_simulations" # TODO This can be commented out?
-# export APPTAINER_BIND="/home/hk-project-pevradio/rn8463/cvmfsexec/dist/cvmfs:/cvmfs,/scratch,/hkfs/work/workspace/scratch/rn8463-gamma_simulations"
-# singularity exec --nv $HOME/osgvo-el7-cuda10.sif /home/hk-project-pevradio/rn8463/simulations_scripts/detectorResponse.sh
-
-$HOME/cvmfsexec/cvmfsexec icecube.opensciencegrid.org -- /bin/bash /home/hk-project-pevradio/rn8463/simulations_scripts/detectorResponse.sh
-# ls /cvmfs/icecube.opensciencegrid.org
-# 
+cp -r $HOME/cvmfsexec/ /scratch/slurm_tmpdir/job_${SLURM_JOB_ID}/
+/scratch/slurm_tmpdir/job_${SLURM_JOB_ID}/cvmfsexec/cvmfsexec icecube.opensciencegrid.org -- /bin/bash /home/hk-project-pevradio/rn8463/simulations_scripts/detectorResponse.sh ${1} ${2}

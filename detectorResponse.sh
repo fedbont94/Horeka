@@ -22,14 +22,14 @@ GCD="/home/hk-project-pevradio/rn8463/GCD/GCD_Base2021.Run135903.T00S1.Pass2_V1b
 year="2025"
 MCdataset=202500
 dataset=12025
-seed=1202500000
+seed=202500000
 energyStep=0.1
 NumbSamples=100
 
 #################################### TODO ####################################
 # Energy range for the detector response
-energyStart=6.8
-energyEnd=6.9
+energyStart=$1
+energyEnd=$2
 
 # Parallelization
 parallelSim=100
