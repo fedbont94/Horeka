@@ -1,11 +1,11 @@
 #!/bin/bash
 #SBATCH --job-name=PhotonDetectorResponse
-#SBATCH --output=/home/hk-project-pevradio/rn8463/logDetResponse/_log%a.out
-#SBATCH --error=/home/hk-project-pevradio/rn8463/logDetResponse/_log%a.err
+#SBATCH --output=/home/hk-project-pevradio/rn8463/log/CorsikaProtonExtended/log%j.out
+#SBATCH --error=/home/hk-project-pevradio/rn8463/log/CorsikaProtonExtended/log%j.err
 #SBATCH --nodes=1
-#SBATCH --time=0-01:00:00
+#SBATCH --time=3-00:00:00
 #SBATCH --tasks=2
-#SBATCH --mem=10gb
+#SBATCH --mem=200gb
 #SBATCH --export=NONE
 #######################SBATCH --gres=gpu:4
 

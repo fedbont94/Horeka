@@ -60,7 +60,10 @@ class CorsikaSimulator:
 
                 # Check if this simulation is not in data. Thus, was already created
                 # There is thus no need to redo it
-                if f"DAT{runNumber}" not in os.listdir(
+                if (
+                    f"DAT{runNumber}"
+                    not in os.listdir(f"{self.fW.directories['data']}/{log10_E1}/")
+                ) and f"DAT{runNumber}.bz2" not in os.listdir(
                     f"{self.fW.directories['data']}/{log10_E1}/"
                 ):
                     # It writes the Corsika input file
