@@ -14,7 +14,7 @@ PYTHON=/cvmfs/icecube.opensciencegrid.org/py3-v4.1.1/RHEL_7_x86_64/bin/python3
 SCRIPT=/home/hk-project-pevradio/rn8463/simulations_scripts/MakeDetectorResponse.py
 
 # Fixed parameters
-inDirectory="/hkfs/work/workspace/scratch/rn8463-proton-corsika/"
+inDirectory="/hkfs/work/workspace/scratch/rn8463-proton-corsika/data/"
 outDirectory="/hkfs/work/workspace/scratch/rn8463-proton_DetectorResponseITonly/2012/"
 detector="IC86"
 GCD="/cvmfs/icecube.opensciencegrid.org/data/GCD/GeoCalibDetectorStatus_2012.Run120844.T00S1.Pass2_V1b_Snow121021.i3.gz"
@@ -29,20 +29,16 @@ NumbFrames=0
 
 #################################### TODO ####################################
 # Energy range for the detector response
-energyStart=4.0
-energyEnd=6.9
+energyStart=${1}
+energyEnd=${1}
 
 # Parallelization
 parallelSim=100
-logDirProcesses="/home/hk-project-pevradio/rn8463/log/logDetProton/"
+logDirProcesses="/home/hk-project-pevradio/rn8463/log/DetProtonExtended/"
 #################################### TODO ####################################
 
-# partition=$(squeue -h -j ${SLURM_JOB_ID} -o "%P")
-# echo "Slurm partition: $partition"
 
-# if [ "$partition" = "accelerated" ] || [ "$partition" = "dev_accelerated" ]
-# then
-# ############### Generated #####################
+################ doITSG #####################
 # $environment1 $PYTHON $SCRIPT \
 #                 -inDirectory $inDirectory \
 #                 -outDirectory $outDirectory \
@@ -62,15 +58,55 @@ logDirProcesses="/home/hk-project-pevradio/rn8463/log/logDetProton/"
 #                 --NumbSamples $NumbSamples \
 #                 --NumbFrames $NumbFrames \
 #                 -doFiltering \
-#                 --doDET 
-                # --doITSG \
-                # --doCLSIM \
+#                 --doITSG 
 
-#                 # --doInIceBg \
-# cd /home/hk-project-pevradio/rn8463/simulations_scripts/
-# ./ExecuteSubFile.sh nothing
-# else
-# ############### Filtered Lv1 and Lv2 #####################
+############### doCLSIM #####################
+# $environment1 $PYTHON $SCRIPT \
+#                 -inDirectory $inDirectory \
+#                 -outDirectory $outDirectory \
+#                 -pythonPath $PYTHON \
+#                 -detector $detector \
+#                 -GCD $GCD \
+#                 -year $year \
+#                 -MCdataset $MCdataset \
+#                 -dataset $dataset \
+#                 -seed $seed \
+#                 -energyStart $energyStart \
+#                 -energyEnd $energyEnd \
+#                 -energyStep $energyStep \
+#                 -logDirProcesses $logDirProcesses \
+#                 -parallelSim 1 \
+#                 --photonDirectory $photonDirectory \
+#                 --NumbSamples $NumbSamples \
+#                 --NumbFrames $NumbFrames \
+#                 -doFiltering \
+#                 --doCLSIM # --doInIceBg 
+                
+
+################ doDET #####################
+# $environment1 $PYTHON $SCRIPT \
+#                 -inDirectory $inDirectory \
+#                 -outDirectory $outDirectory \
+#                 -pythonPath $PYTHON \
+#                 -detector $detector \
+#                 -GCD $GCD \
+#                 -year $year \
+#                 -MCdataset $MCdataset \
+#                 -dataset $dataset \
+#                 -seed $seed \
+#                 -energyStart $energyStart \
+#                 -energyEnd $energyEnd \
+#                 -energyStep $energyStep \
+#                 -logDirProcesses $logDirProcesses \
+#                 -parallelSim 1 \
+#                 --photonDirectory $photonDirectory \
+#                 --NumbSamples $NumbSamples \
+#                 --NumbFrames $NumbFrames \
+#                 -doFiltering \
+#                 --doDET 
+
+
+# # ############### Filtered Lv1 and Lv2 #####################
 # $environment2 $PYTHON $SCRIPT \
 #                 -inDirectory $inDirectory \
 #                 -outDirectory $outDirectory \
@@ -85,7 +121,7 @@ logDirProcesses="/home/hk-project-pevradio/rn8463/log/logDetProton/"
 #                 -energyEnd $energyEnd \
 #                 -energyStep $energyStep \
 #                 -logDirProcesses $logDirProcesses \
-#                 -parallelSim $parallelSim \
+#                 -parallelSim 50 \
 #                 --photonDirectory $photonDirectory \
 #                 --NumbSamples $NumbSamples \
 #                 --NumbFrames $NumbFrames \
@@ -93,8 +129,6 @@ logDirProcesses="/home/hk-project-pevradio/rn8463/log/logDetProton/"
 #                 --doLV1 \
 #                 --doLV2 
 
-
-# parallelSim=1 # This is for the lv3 if you want to run the in-ice response
 ############### Filtered Lv3 #####################
 eval `/cvmfs/icecube.opensciencegrid.org/py3-v4.1.1/setup.sh`
 $environment3 $PYTHON $SCRIPT \
@@ -111,10 +145,9 @@ $environment3 $PYTHON $SCRIPT \
                 -energyEnd $energyEnd \
                 -energyStep $energyStep \
                 -logDirProcesses $logDirProcesses \
-                -parallelSim 30 \
+                -parallelSim 1 \
                 --photonDirectory $photonDirectory \
                 --NumbSamples $NumbSamples \
                 --NumbFrames $NumbFrames \
                 -doFiltering \
                 --doLV3 
-# fi

@@ -1,11 +1,11 @@
 #!/bin/bash
 #SBATCH --job-name=ProtonDetectorResponse
-#SBATCH --output=/home/hk-project-pevradio/rn8463/log/logDetProton/%j.out
-#SBATCH --error=/home/hk-project-pevradio/rn8463/log/logDetProton/%j.err
+#SBATCH --output=/home/hk-project-pevradio/rn8463/log/DetProtonExtended/%j.out
+#SBATCH --error=/home/hk-project-pevradio/rn8463/log/DetProtonExtended/%j.err
 #SBATCH --nodes=1
 #SBATCH --time=2-00:00:00
-#SBATCH --mem=200gb
+#SBATCH --mem=300gb
 #SBATCH --export=NONE
 
 cp -r $HOME/cvmfsexec/ /scratch/slurm_tmpdir/job_${SLURM_JOB_ID}/
-/scratch/slurm_tmpdir/job_${SLURM_JOB_ID}/cvmfsexec icecube.opensciencegrid.org -- /bin/bash /home/hk-project-pevradio/rn8463/simulations_scripts/detectorResponse.sh
+/scratch/slurm_tmpdir/job_${SLURM_JOB_ID}/cvmfsexec/cvmfsexec icecube.opensciencegrid.org -- /bin/bash /home/hk-project-pevradio/rn8463/simulations_scripts/detectorResponse.sh ${1}
