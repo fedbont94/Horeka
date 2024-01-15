@@ -357,19 +357,21 @@ class ProcessRunner:
                 self.executeFile(key=f"{energy}_{runname}_clsim", exeFile=exeFile)
         ################################# detector ##############################################
         if self.extraOptions.get("doDET"):
-            if self.extraOptions.get("doCLSIM"):
-                inputFile = self.detectorSim.run_clsim(
-                    energy=energy,
-                    inputFile=inputFile,
-                    runname=runname,
-                    nproc=nproc,
-                    procnum=procnum,
-                    oversize=5,
-                    efficiency=1.0,
-                    icemodel="spice_3.2.1",
-                    return_name=True,
-                )
-            else:
+            inputFile = self.detectorSim.run_clsim(
+                energy=energy,
+                inputFile="",
+                runname=runname,
+                nproc=nproc,
+                procnum=procnum,
+                oversize=5,
+                efficiency=1.0,
+                icemodel="spice_3.2.1",
+                return_name=True,
+            )
+
+            # check if the input file exists
+            if not os.path.isfile(inputFile):
+                print("CLSIM file does not exist, using ITShowerGenerator file")
                 inputFile = self.detectorSim.run_ITShowerGenerator(
                     energy=energy,
                     inputFile=corsikaFile,

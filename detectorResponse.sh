@@ -84,26 +84,26 @@ logDirProcesses="/home/hk-project-pevradio/rn8463/log/DetProtonExtended/"
                 
 
 ################ doDET #####################
-# $environment1 $PYTHON $SCRIPT \
-#                 -inDirectory $inDirectory \
-#                 -outDirectory $outDirectory \
-#                 -pythonPath $PYTHON \
-#                 -detector $detector \
-#                 -GCD $GCD \
-#                 -year $year \
-#                 -MCdataset $MCdataset \
-#                 -dataset $dataset \
-#                 -seed $seed \
-#                 -energyStart $energyStart \
-#                 -energyEnd $energyEnd \
-#                 -energyStep $energyStep \
-#                 -logDirProcesses $logDirProcesses \
-#                 -parallelSim 1 \
-#                 --photonDirectory $photonDirectory \
-#                 --NumbSamples $NumbSamples \
-#                 --NumbFrames $NumbFrames \
-#                 -doFiltering \
-#                 --doDET 
+$environment1 $PYTHON $SCRIPT \
+                -inDirectory $inDirectory \
+                -outDirectory $outDirectory \
+                -pythonPath $PYTHON \
+                -detector $detector \
+                -GCD $GCD \
+                -year $year \
+                -MCdataset $MCdataset \
+                -dataset $dataset \
+                -seed $seed \
+                -energyStart $energyStart \
+                -energyEnd $energyEnd \
+                -energyStep $energyStep \
+                -logDirProcesses $logDirProcesses \
+                -parallelSim 30 \
+                --photonDirectory $photonDirectory \
+                --NumbSamples $NumbSamples \
+                --NumbFrames $NumbFrames \
+                -doFiltering \
+                --doDET 
 
 
 # # ############### Filtered Lv1 and Lv2 #####################
@@ -130,24 +130,24 @@ logDirProcesses="/home/hk-project-pevradio/rn8463/log/DetProtonExtended/"
 #                 --doLV2 
 
 ############### Filtered Lv3 #####################
-eval `/cvmfs/icecube.opensciencegrid.org/py3-v4.1.1/setup.sh`
-$environment3 $PYTHON $SCRIPT \
-                -inDirectory $inDirectory \
-                -outDirectory $outDirectory \
-                -pythonPath $PYTHON \
-                -detector $detector \
-                -GCD $GCD \
-                -year $year \
-                -MCdataset $MCdataset \
-                -dataset $dataset \
-                -seed $seed \
-                -energyStart $energyStart \
-                -energyEnd $energyEnd \
-                -energyStep $energyStep \
-                -logDirProcesses $logDirProcesses \
-                -parallelSim 1 \
-                --photonDirectory $photonDirectory \
-                --NumbSamples $NumbSamples \
-                --NumbFrames $NumbFrames \
-                -doFiltering \
-                --doLV3 
+# eval `/cvmfs/icecube.opensciencegrid.org/py3-v4.1.1/setup.sh`
+# $environment3 $PYTHON $SCRIPT \
+#                 -inDirectory $inDirectory \
+#                 -outDirectory $outDirectory \
+#                 -pythonPath $PYTHON \
+#                 -detector $detector \
+#                 -GCD $GCD \
+#                 -year $year \
+#                 -MCdataset $MCdataset \
+#                 -dataset $dataset \
+#                 -seed $seed \
+#                 -energyStart $energyStart \
+#                 -energyEnd $energyEnd \
+#                 -energyStep $energyStep \
+#                 -logDirProcesses $logDirProcesses \
+#                 -parallelSim 1 \
+#                 --photonDirectory $photonDirectory \
+#                 --NumbSamples $NumbSamples \
+#                 --NumbFrames $NumbFrames \
+#                 -doFiltering \
+#                 --doLV3 

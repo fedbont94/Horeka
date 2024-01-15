@@ -462,6 +462,13 @@ class DetectorSimulator:
             exeFile: the file that need to be executed
 
         """
+
+        outputFolder = f"{self.outDirectory}/generated/clsim"
+        outputFolder += f"/CLS_{self.detector}_corsika_icetop.{self.MCdataset}/"
+
+        if return_name:
+            return f"{outputFolder}/data/{energy}/{runname}.i3.bz2"
+
         self.checkIfInputExists(inputFile)
 
         icemodellocation = f"{self.i3build}/ice-models/resources/models/ICEMODEL"
@@ -471,13 +478,6 @@ class DetectorSimulator:
         holeiceparametrization = (
             f"{self.i3build}/ice-models/resources/models/ICEMODEL/spice_ftp-v1/as.dat"
         )
-
-        outputFolder = f"{self.outDirectory}/generated/clsim"
-        outputFolder += f"/CLS_{self.detector}_corsika_icetop.{self.MCdataset}/"
-
-        if return_name:
-            return f"{outputFolder}/data/{energy}/{runname}.i3.bz2"
-
         CLSdataFile = (
             f"{outputFolder}/data/{energy}/{runname}.i3.bz2"  # Path and File name
         )
@@ -612,6 +612,7 @@ class DetectorSimulator:
             --gcdfile {self.GCD} \
             --LowMem \
             --IceTop \
+            --no-FilterTrigger \
             --UseLinearTree \
             --MCPrescale {mcprescale} \
             --MCType {mctype} \
@@ -623,8 +624,8 @@ class DetectorSimulator:
             --inputfile {inputFile} \
             --outputfile {tempFile} > {logsFile}.out 2> {logsFile}.err \
             "
-        if not doFiltering:
-            cmdOptions += "--no-FilterTrigger "
+        # if not doFiltering:
+        #     cmdOptions += "--no-FilterTrigger "
 
         if self.NumbFrames:
             cmdOptions += f"-n {self.NumbFrames} "
