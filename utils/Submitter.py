@@ -87,7 +87,7 @@ class Submitter:
             # Waits before restarting the loop.
             # This is done to avoid overloading the CPU with useless checks
             sleepTime = 1  # seconds
-            time.sleep(sleepTime)
+            # time.sleep(sleepTime)
         return
 
     def singleCheck(self):

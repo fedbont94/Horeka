@@ -250,6 +250,8 @@ class ProcessRunner:
             for index, corsikaFile in enumerate(fileList):
                 if corsikaFile.endswith(".bz2"):
                     corsikaFile = corsikaFile[:-4]
+                    if os.path.isfile(inDir + corsikaFile):
+                        continue
                 elif corsikaFile.endswith(".log") or corsikaFile.endswith(".long"):
                     continue
                 runID = int(corsikaFile.partition("DAT")[-1][-5:])
@@ -381,6 +383,7 @@ class ProcessRunner:
                     runID=runID,
                     return_name=True,
                 )
+                print(inputFile)
 
             exeFile, DETFile = self.detectorSim.run_detector(
                 energy=energy,

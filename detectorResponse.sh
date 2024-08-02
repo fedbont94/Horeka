@@ -29,8 +29,8 @@ NumbFrames=0
 
 #################################### TODO ####################################
 # Energy range for the detector response
-energyStart=${1}
-energyEnd=${1}
+energyStart=5.0 #${1}
+energyEnd=6.6 #${1}
 
 # Parallelization
 parallelSim=100
@@ -98,7 +98,7 @@ $environment1 $PYTHON $SCRIPT \
                 -energyEnd $energyEnd \
                 -energyStep $energyStep \
                 -logDirProcesses $logDirProcesses \
-                -parallelSim 30 \
+                -parallelSim 1 \
                 --photonDirectory $photonDirectory \
                 --NumbSamples $NumbSamples \
                 --NumbFrames $NumbFrames \
@@ -107,47 +107,47 @@ $environment1 $PYTHON $SCRIPT \
 
 
 # # ############### Filtered Lv1 and Lv2 #####################
-# $environment2 $PYTHON $SCRIPT \
-#                 -inDirectory $inDirectory \
-#                 -outDirectory $outDirectory \
-#                 -pythonPath $PYTHON \
-#                 -detector $detector \
-#                 -GCD $GCD \
-#                 -year $year \
-#                 -MCdataset $MCdataset \
-#                 -dataset $dataset \
-#                 -seed $seed \
-#                 -energyStart $energyStart \
-#                 -energyEnd $energyEnd \
-#                 -energyStep $energyStep \
-#                 -logDirProcesses $logDirProcesses \
-#                 -parallelSim 50 \
-#                 --photonDirectory $photonDirectory \
-#                 --NumbSamples $NumbSamples \
-#                 --NumbFrames $NumbFrames \
-#                 -doFiltering \
-#                 --doLV1 \
-#                 --doLV2 
+$environment2 $PYTHON $SCRIPT \
+                -inDirectory $inDirectory \
+                -outDirectory $outDirectory \
+                -pythonPath $PYTHON \
+                -detector $detector \
+                -GCD $GCD \
+                -year $year \
+                -MCdataset $MCdataset \
+                -dataset $dataset \
+                -seed $seed \
+                -energyStart $energyStart \
+                -energyEnd $energyEnd \
+                -energyStep $energyStep \
+                -logDirProcesses $logDirProcesses \
+                -parallelSim 1 \
+                --photonDirectory $photonDirectory \
+                --NumbSamples $NumbSamples \
+                --NumbFrames $NumbFrames \
+                -doFiltering \
+                --doLV1 \
+                --doLV2 
 
-############### Filtered Lv3 #####################
-# eval `/cvmfs/icecube.opensciencegrid.org/py3-v4.1.1/setup.sh`
-# $environment3 $PYTHON $SCRIPT \
-#                 -inDirectory $inDirectory \
-#                 -outDirectory $outDirectory \
-#                 -pythonPath $PYTHON \
-#                 -detector $detector \
-#                 -GCD $GCD \
-#                 -year $year \
-#                 -MCdataset $MCdataset \
-#                 -dataset $dataset \
-#                 -seed $seed \
-#                 -energyStart $energyStart \
-#                 -energyEnd $energyEnd \
-#                 -energyStep $energyStep \
-#                 -logDirProcesses $logDirProcesses \
-#                 -parallelSim 1 \
-#                 --photonDirectory $photonDirectory \
-#                 --NumbSamples $NumbSamples \
-#                 --NumbFrames $NumbFrames \
-#                 -doFiltering \
-#                 --doLV3 
+# # ############### Filtered Lv3 #####################
+eval `/cvmfs/icecube.opensciencegrid.org/py3-v4.1.1/setup.sh`
+$environment3 $PYTHON $SCRIPT \
+                -inDirectory $inDirectory \
+                -outDirectory $outDirectory \
+                -pythonPath $PYTHON \
+                -detector $detector \
+                -GCD $GCD \
+                -year $year \
+                -MCdataset $MCdataset \
+                -dataset $dataset \
+                -seed $seed \
+                -energyStart $energyStart \
+                -energyEnd $energyEnd \
+                -energyStep $energyStep \
+                -logDirProcesses $logDirProcesses \
+                -parallelSim 1 \
+                --photonDirectory $photonDirectory \
+                --NumbSamples $NumbSamples \
+                --NumbFrames $NumbFrames \
+                -doFiltering \
+                --doLV3 

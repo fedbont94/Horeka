@@ -3,8 +3,8 @@
 #SBATCH --output=/home/hk-project-pevradio/rn8463/log/DetProtonExtended/%j.out
 #SBATCH --error=/home/hk-project-pevradio/rn8463/log/DetProtonExtended/%j.err
 #SBATCH --nodes=1
-#SBATCH --time=2-00:00:00
-#SBATCH --mem=300gb
+#SBATCH --time=0-01:00:00
+#SBATCH --mem=50gb
 #SBATCH --export=NONE
 
 cp -r $HOME/cvmfsexec/ /scratch/slurm_tmpdir/job_${SLURM_JOB_ID}/
