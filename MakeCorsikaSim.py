@@ -49,7 +49,7 @@ def __checkInputs(args):
             "The energy End value MUST be greater (nor equal) then the starting one!!"
         )
 
-    if not args.energyEnd <= 10_000:
+    if not args.endNumber <= 10_000:
         sys.exit(
             "The energy End value MUST be less then 10.000!! The seed number is not unique otherwise!"
         )
@@ -211,8 +211,7 @@ def mainCorsikaSim(args):
     energies = np.around(  # Need to round the numpy array otherwise the floating is wrong
         np.arange(
             args.energyStart,  # energy starting point
-            args.energyEnd
-            + args.energyStep,  # energy end point plus one step in order to include last step
+            args.energyEnd,  # energy end point
             args.energyStep,  # step in energies
         ),
         decimals=1,  # the rounding has to have one single decimal point for the folder.
