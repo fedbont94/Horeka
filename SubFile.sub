@@ -1,10 +1,10 @@
 #!/bin/bash
 #SBATCH --job-name=ProtonDetectorResponse
-#SBATCH --output=/home/hk-project-pevradio/rn8463/log/DetProtonExtended/%j.out
-#SBATCH --error=/home/hk-project-pevradio/rn8463/log/DetProtonExtended/%j.err
+#SBATCH --output=/hkfs/work/workspace/scratch/rn8463-gamma-detectorResponse/logs/%j.out
+#SBATCH --error=/hkfs/work/workspace/scratch/rn8463-gamma-detectorResponse/logs/%j.err
 #SBATCH --nodes=1
-#SBATCH --time=0-01:00:00
-#SBATCH --mem=50gb
+#SBATCH --time=3-00:00:00
+#SBATCH --mem=100gb
 #SBATCH --export=NONE
 
 cp -r $HOME/cvmfsexec/ /scratch/slurm_tmpdir/job_${SLURM_JOB_ID}/

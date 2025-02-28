@@ -2,6 +2,16 @@
 if [ "$1" = "clsim" ]
 then
     echo "Submitting clsim jobs on GPU nodes"
+    sbatch -A hk-project-pevradio --partition=accelerated --gres=gpu:4 SubFile.sub 4.0
+    sbatch -A hk-project-pevradio --partition=accelerated --gres=gpu:4 SubFile.sub 4.1
+    sbatch -A hk-project-pevradio --partition=accelerated --gres=gpu:4 SubFile.sub 4.2
+    sbatch -A hk-project-pevradio --partition=accelerated --gres=gpu:4 SubFile.sub 4.3
+    sbatch -A hk-project-pevradio --partition=accelerated --gres=gpu:4 SubFile.sub 4.4
+    sbatch -A hk-project-pevradio --partition=accelerated --gres=gpu:4 SubFile.sub 4.5
+    sbatch -A hk-project-pevradio --partition=accelerated --gres=gpu:4 SubFile.sub 4.6
+    sbatch -A hk-project-pevradio --partition=accelerated --gres=gpu:4 SubFile.sub 4.7
+    sbatch -A hk-project-pevradio --partition=accelerated --gres=gpu:4 SubFile.sub 4.8
+    sbatch -A hk-project-pevradio --partition=accelerated --gres=gpu:4 SubFile.sub 4.9   
     sbatch -A hk-project-pevradio --partition=accelerated --gres=gpu:4 SubFile.sub 5.0
     sbatch -A hk-project-pevradio --partition=accelerated --gres=gpu:4 SubFile.sub 5.1
     sbatch -A hk-project-pevradio --partition=accelerated --gres=gpu:4 SubFile.sub 5.2
@@ -18,7 +28,21 @@ then
     sbatch -A hk-project-pevradio --partition=accelerated --gres=gpu:4 SubFile.sub 6.3
     sbatch -A hk-project-pevradio --partition=accelerated --gres=gpu:4 SubFile.sub 6.4
     sbatch -A hk-project-pevradio --partition=accelerated --gres=gpu:4 SubFile.sub 6.5
+    sbatch -A hk-project-pevradio --partition=accelerated --gres=gpu:4 SubFile.sub 6.6
+    sbatch -A hk-project-pevradio --partition=accelerated --gres=gpu:4 SubFile.sub 6.7
+    sbatch -A hk-project-pevradio --partition=accelerated --gres=gpu:4 SubFile.sub 6.8
+    sbatch -A hk-project-pevradio --partition=accelerated --gres=gpu:4 SubFile.sub 6.9
 else
+    sbatch -A hk-project-pevradio --partition=cpuonly SubFile.sub 4.0
+    sbatch -A hk-project-pevradio --partition=cpuonly SubFile.sub 4.1
+    sbatch -A hk-project-pevradio --partition=cpuonly SubFile.sub 4.2
+    sbatch -A hk-project-pevradio --partition=cpuonly SubFile.sub 4.3
+    sbatch -A hk-project-pevradio --partition=cpuonly SubFile.sub 4.4
+    sbatch -A hk-project-pevradio --partition=cpuonly SubFile.sub 4.5
+    sbatch -A hk-project-pevradio --partition=cpuonly SubFile.sub 4.6
+    sbatch -A hk-project-pevradio --partition=cpuonly SubFile.sub 4.7
+    sbatch -A hk-project-pevradio --partition=cpuonly SubFile.sub 4.8
+    sbatch -A hk-project-pevradio --partition=cpuonly SubFile.sub 4.9  
     sbatch -A hk-project-pevradio --partition=cpuonly SubFile.sub 5.0
     sbatch -A hk-project-pevradio --partition=cpuonly SubFile.sub 5.1
     sbatch -A hk-project-pevradio --partition=cpuonly SubFile.sub 5.2
@@ -35,4 +59,8 @@ else
     sbatch -A hk-project-pevradio --partition=cpuonly SubFile.sub 6.3
     sbatch -A hk-project-pevradio --partition=cpuonly SubFile.sub 6.4
     sbatch -A hk-project-pevradio --partition=cpuonly SubFile.sub 6.5
+    sbatch -A hk-project-pevradio --partition=cpuonly SubFile.sub 6.6
+    sbatch -A hk-project-pevradio --partition=cpuonly SubFile.sub 6.7
+    sbatch -A hk-project-pevradio --partition=cpuonly SubFile.sub 6.8
+    sbatch -A hk-project-pevradio --partition=cpuonly SubFile.sub 6.9
 fi
