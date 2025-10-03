@@ -1,0 +1,44 @@
+How to install Corsika on Horeka
+in .bash_profile add :
+module load compiler/gnu/10
+in .bashrc
+# Corsika environmental variables
+export FLUPRO='/home/hk-project-pevradio/rn8463/programs/fluka/' # Need to be changed to the fluka folder!! 
+export FLUFOR=gfortran
+export F77=gfortran
+scp corsika
+/home/hk-project-pevradio/df3866/programs/corsika/corsika-77401.tar.gz
+or @data.icecube.wisc.edu:/data/user/rturcotte/corsika/corsika-77401.tar.gz
+scp fluka
+/home/hk-project-pevradio/df3866/programs/fluka/fluka2011.2x-linux-gfor64bit-gcc8.3-AA.tar.gz
+or @data.icecube.wisc.edu:/home/acoleman/work/programs/fluka/fluka2011.2x-linux-gfor64bit-gcc8.3-AA.tar.gz
+untar fluka (tar -zxvf <file.tar.gz>)
+make
+untar corsika
+./coconut
+===============
+Surface Array
+compiler problem fix :
+export CC=$(which gcc)
+export CXX=$(which g++)
+
+In corsika configurator : 
+2                   -> default compiler
+6                   -> SIBYLL 2.3d
+2                   -> FLUKA
+1                   -> horizontal flat - normal for surface detector
+
+a c 6
+  options:   HORIZONTAL FLUKA FLUKADIR SIBYLL TIMEAUTO
+  selection: CONEXDIR UPWARD CONEX CHARM CURVED SLANT THIN COREAS PYTHIADIR
+f
+
+You should read something like this:
+
+--> "corsika77401Linux_SIBYLL_fluka_thin_conex_coreas" successfully installed in :
+    /hkfs/home/project/hk-project-pevradio/rn8463/corsika/corsika-77401/run/
+ 
+--> You can run CORSIKA in /hkfs/home/project/hk-project-pevradio/rn8463/corsika/corsika-77401/run/ using for instance :
+    ./corsika77401Linux_SIBYLL_fluka_thin_conex_coreas < conex-3D-inputs > output.txt
+ 
+
